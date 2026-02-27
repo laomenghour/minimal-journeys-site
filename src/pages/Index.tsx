@@ -5,13 +5,12 @@ import profileImg from "@/assets/mh_profile.png";
 const Index = () => {
   return (
     <div className="relative flex min-h-screen flex-col justify-between bg-background px-6 py-6 md:px-12 md:py-10 lg:px-16">
-      <div className="flex items-center justify-between">
-        <img src={profileImg} alt="Menghour" className="w-10 h-10 rounded-full" />
+      <nav className="flex items-center justify-between" aria-label="Main navigation">
+        <img src={profileImg} alt="Menghour" className="w-14 h-14 rounded-full" />
         <ThemeToggle />
-      </div>
+      </nav>
 
-      {/* Hero */}
-      <header className="flex flex-1 flex-col justify-center max-w-4xl">
+      <main className="flex flex-1 flex-col justify-center max-w-4xl">
         <h1 className="text-5xl md:text-7xl lg:text-8xl font-semibold leading-[1.05] tracking-tight text-foreground">
           Menghour builds
           <br />
@@ -20,7 +19,7 @@ const Index = () => {
         <p className="mt-4 text-lg md:text-xl tracking-wide text-muted-foreground font-light">
           From Cambodia to the world.
         </p>
-      </header>
+      </main>
 
       {/* Bottom Grid */}
       <footer className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8 pt-12 pb-4 font-light text-sm tracking-wide uppercase">
