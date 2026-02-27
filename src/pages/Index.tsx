@@ -1,10 +1,14 @@
 import ThemeToggle from "@/components/ThemeToggle";
 import ExternalLink from "@/components/ExternalLink";
+import profileImg from "@/assets/mh_profile.png";
 
 const Index = () => {
   return (
     <div className="relative flex min-h-screen flex-col justify-between bg-background px-6 py-6 md:px-12 md:py-10 lg:px-16">
-      <ThemeToggle />
+      <div className="flex items-center justify-between">
+        <img src={profileImg} alt="Menghour" className="w-10 h-10 rounded-full" />
+        <ThemeToggle />
+      </div>
 
       {/* Hero */}
       <header className="flex flex-1 flex-col justify-center max-w-4xl">
@@ -26,7 +30,7 @@ const Index = () => {
             Hobbies
           </h2>
           <p className="normal-case text-muted-foreground leading-relaxed text-xs tracking-normal lowercase first-letter:uppercase">
-            Taking street photography and sometimes writing.
+            Capturing streets 📸 ,{"\n"}writing stories sometimes ✍🏻.
           </p>
           <div className="flex flex-col gap-1.5 pt-1">
             <ExternalLink href="https://www.instagram.com/photo.bymenghour/">
