@@ -60,8 +60,11 @@ const Index = () => {
           </h2>
           <div className="flex flex-col gap-1.5 text-muted-foreground">
             <span className="text-foreground">BookMe+ <span className="text-muted-foreground text-xs">(Present)</span></span>
+            <span>Hang Meas Mobile</span>
+            <span>VET Airbus</span>
             <span>VDEUK</span>
             <span>VTENH</span>
+            <span>GTVC Speedboat</span>
             <span>BookMeBus</span>
           </div>
         </div>
