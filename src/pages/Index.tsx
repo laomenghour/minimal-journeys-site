@@ -12,9 +12,7 @@ const Index = () => {
 
       <main className="flex flex-1 flex-col justify-center max-w-4xl">
         <h1 className="text-5xl md:text-7xl lg:text-8xl font-semibold leading-[1.05] tracking-tight text-foreground">
-          Menghou builds
-          <br />
-          things that scale test.
+          Hello Visitors
         </h1>
         <p className="mt-4 text-lg md:text-xl tracking-wide text-muted-foreground font-light">
           From Cambodia to the world.
