@@ -14,7 +14,7 @@ const Index = () => {
         <h1 className="text-5xl md:text-7xl lg:text-8xl font-semibold leading-[1.05] tracking-tight text-foreground">
           Menghour builds
           <br />
-          things that scale.
+          things that scale test.
         </h1>
         <p className="mt-4 text-lg md:text-xl tracking-wide text-muted-foreground font-light">
           From Cambodia to the world.
