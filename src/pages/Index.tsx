@@ -1,5 +1,4 @@
 import { useRef, useEffect, useState } from "react";
-import ThemeToggle from "@/components/ThemeToggle";
 import ExternalLink from "@/components/ExternalLink";
 import profileImg from "@/assets/mh_profile.png";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
@@ -30,6 +29,7 @@ const services = [
 const Index = () => {
   const designRef    = useRef<HTMLElement>(null);
   const projectsRef  = useRef<HTMLDivElement>(null);
+  const footerRef    = useRef<HTMLElement>(null);
   const [inView, setInView]               = useState(false);
   const [projectsVisible, setProjectsVisible] = useState(false);
   const [hovered, setHovered]             = useState<string | null>(null);
@@ -76,7 +76,33 @@ const Index = () => {
       >
         <nav className="hero-nav flex items-center justify-between py-4" aria-label="Main navigation">
           <img src={profileImg} alt="Menghour" className="w-12 h-12" style={{ borderRadius: 0 }} />
-          <ThemeToggle />
+          <div style={{ display: "flex", gap: 32 }}>
+            {[
+              { label: "Work",     ref: designRef },
+              { label: "About Me", ref: footerRef },
+            ].map(({ label, ref }) => (
+              <button
+                key={label}
+                onClick={() => {
+                  const top = (ref.current?.getBoundingClientRect().top ?? 0) + window.scrollY;
+                  window.scrollTo({ top, behavior: "smooth" });
+                }}
+                className="font-inter link-underline"
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "#ffffff",
+                  fontSize: 14,
+                  fontWeight: 500,
+                  cursor: "pointer",
+                  padding: 0,
+                  letterSpacing: "normal",
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </nav>
 
         <main className="flex flex-1 flex-col justify-center" style={{ paddingTop: 56, paddingBottom: 56 }}>
@@ -187,7 +213,7 @@ const Index = () => {
       </section>
 
 {/* ── Footer — Enhanced ── */}
-      <footer className="footer-dark" style={{ background: "#111111", borderTop: "1px solid #1a1a1a" }}>
+      <footer ref={footerRef} className="footer-dark" style={{ background: "#111111", borderTop: "1px solid #1a1a1a" }}>
 
         {/* 3-column grid */}
         <div
