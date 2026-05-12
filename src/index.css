@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@100;200;300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Anton&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -92,19 +92,146 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sora antialiased;
+    @apply bg-background text-foreground font-inter antialiased;
+    border-radius: 0;
   }
 }
 
+/* ─────────────────────────────────────────
+   Smooth scroll
+───────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+}
+
+/* ─────────────────────────────────────────
+   Scrollbar — black thumb
+───────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #111111;
+  border-radius: 0;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #000000;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #111111 transparent;
+}
+
+/* ─────────────────────────────────────────
+   Hero — page-load animations
+───────────────────────────────────────── */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes clip-up {
+  from { transform: translateY(110%); }
+  to   { transform: translateY(0); }
+}
+
+/* Every hero text element clips up from its own mask */
+.hero-mask {
+  overflow: hidden;
+  display: block;
+}
+
+.hero-nav {
+  animation: fade-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.05s;
+}
+
+/* Items inside .hero-mask animate with clip-up */
+.hero-mask .hero-item {
+  display: block;
+  animation: clip-up 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.hero-mask:nth-of-type(1) .hero-item { animation-delay: 0.15s; }
+.hero-mask:nth-of-type(2) .hero-item { animation-delay: 0.30s; }
+.hero-mask:nth-of-type(3) .hero-item { animation-delay: 0.50s; }
+
+/* Explicit delay helpers used inline */
+.delay-1 { animation-delay: 0.15s; }
+.delay-2 { animation-delay: 0.32s; }
+.delay-3 { animation-delay: 0.52s; }
+.delay-4 { animation-delay: 0.70s; }
+
+/* ─────────────────────────────────────────
+   Scroll reveal — base state
+───────────────────────────────────────── */
+[data-animate] {
+  opacity: 0;
+  transform: translateY(32px);
+  transition:
+    opacity  0.85s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--reveal-delay, 0s);
+}
+
+[data-animate].is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Clip variant — for project rows */
+[data-animate-clip] {
+  overflow: hidden;
+}
+
+/* Named class avoids inline-style specificity conflicts */
+.clip-child {
+  transform: translateY(112%);
+  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--reveal-delay, 0s);
+}
+
+[data-animate-clip].is-visible .clip-child {
+  transform: translateY(0);
+}
+
 @layer components {
+  /* Nav / footer text links — 1px underline on hover */
   .link-underline {
-    @apply relative inline-block;
+    @apply relative inline-block font-inter font-medium;
+    font-size: 14px;
+    letter-spacing: normal;
   }
   .link-underline::after {
     content: '';
-    @apply absolute bottom-0 left-0 w-0 h-px bg-foreground transition-all duration-300;
+    @apply absolute bottom-0 left-0 w-0 transition-all duration-300;
+    height: 1px;
+    background-color: currentColor;
   }
   .link-underline:hover::after {
     @apply w-full;
+  }
+
+  /* Footer dark overrides */
+  .footer-dark .link-underline {
+    color: #6b7280;
+  }
+  .footer-dark .link-underline:hover {
+    color: #ffffff;
+  }
+  .footer-dark .link-underline::after {
+    background-color: #ffffff;
+  }
+
+  /* Project title rows */
+  .project-title {
+    position: relative;
+    display: block;
+    cursor: default;
   }
 }

@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import animate from "tailwindcss-animate";
 
 export default {
   darkMode: ["class"],
@@ -14,7 +15,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        sora: ["Sora", "sans-serif"],
+        inter: ["Inter", "sans-serif"],
+        anton: ["Anton", "sans-serif"],
+        "space-mono": ["Space Mono", "monospace"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -82,5 +85,5 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [animate],
 } satisfies Config;
