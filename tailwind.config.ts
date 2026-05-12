@@ -15,9 +15,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        inter: ["Inter", "sans-serif"],
+        sora: ["Sora", "sans-serif"],
         anton: ["Anton", "sans-serif"],
-        "space-mono": ["Space Mono", "monospace"],
       },
       colors: {
         border: "hsl(var(--border))",

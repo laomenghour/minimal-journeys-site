@@ -87,7 +87,7 @@ const Index = () => {
                   const top = (ref.current?.getBoundingClientRect().top ?? 0) + window.scrollY;
                   window.scrollTo({ top, behavior: "smooth" });
                 }}
-                className="font-inter link-underline"
+                className="font-sora link-underline"
                 style={{
                   background: "none",
                   border: "none",
@@ -108,7 +108,7 @@ const Index = () => {
         <main className="flex flex-1 flex-col justify-center" style={{ paddingTop: 56, paddingBottom: 56 }}>
           {/* Eyebrow — clips up */}
           <div className="hero-mask" style={{ marginBottom: 24 }}>
-            <p className="hero-item delay-1 font-inter" style={{ fontSize: 16, fontWeight: 500, color: "#6b7280" }}>
+            <p className="hero-item delay-1 font-sora" style={{ fontSize: 16, fontWeight: 500, color: "#6b7280" }}>
               Product Designer · Cambodia
             </p>
           </div>
@@ -125,7 +125,7 @@ const Index = () => {
 
           {/* Subtext — clips up */}
           <div className="hero-mask" style={{ marginTop: 24 }}>
-            <p className="hero-item delay-3 font-inter" style={{ fontSize: 26, fontWeight: 500, color: "#6b7280", lineHeight: 1.15 }}>
+            <p className="hero-item delay-3 font-sora" style={{ fontSize: 26, fontWeight: 500, color: "#6b7280", lineHeight: 1.15 }}>
               From Cambodia to the world.
             </p>
           </div>
@@ -146,7 +146,7 @@ const Index = () => {
       >
         <p
           data-animate
-          className="font-inter mb-14"
+          className="font-sora mb-14"
           style={{ fontSize: 26, fontWeight: 500, color: inView ? "#111111" : "#4b5563", transition: "color 0.8s ease" }}
         >
           UX/UI Design
@@ -200,7 +200,7 @@ const Index = () => {
                   </span>
                   {name}
                   {tag && (
-                    <span className="font-inter" style={{ fontSize: 14, fontWeight: 500, letterSpacing: "0.05em", textTransform: "uppercase", color: inView ? "#6b7280" : "#4b5563", transition: "color 0.8s ease" }}>
+                    <span className="font-sora" style={{ fontSize: 14, fontWeight: 500, letterSpacing: "0.05em", textTransform: "uppercase", color: inView ? "#6b7280" : "#4b5563", transition: "color 0.8s ease" }}>
                       {tag}
                     </span>
                   )}
@@ -223,11 +223,11 @@ const Index = () => {
           {/* Services */}
           <div data-animate style={{ "--reveal-delay": "0s" } as React.CSSProperties}>
             <div style={{ borderTop: "1px solid #2b2b2b", paddingTop: 20, marginBottom: 24 }}>
-              <h2 className="font-space-mono" style={{ fontSize: 11, fontWeight: 700, color: "#4b5563", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+              <h2 className="font-sora" style={{ fontSize: 11, fontWeight: 700, color: "#4b5563", letterSpacing: "0.12em", textTransform: "uppercase" }}>
                 Skills
               </h2>
             </div>
-            <ul className="font-inter" style={{ display: "flex", flexDirection: "column", gap: 7, fontSize: 14, color: "#d1d5db", listStyle: "none", padding: 0, margin: 0, lineHeight: 1.5 }}>
+            <ul className="font-sora" style={{ display: "flex", flexDirection: "column", gap: 7, fontSize: 14, color: "#d1d5db", listStyle: "none", padding: 0, margin: 0, lineHeight: 1.5 }}>
               {services.map((s) => <li key={s}>{s}</li>)}
             </ul>
           </div>
@@ -235,11 +235,11 @@ const Index = () => {
           {/* Social Media */}
           <div data-animate style={{ "--reveal-delay": "0.1s" } as React.CSSProperties}>
             <div style={{ borderTop: "1px solid #2b2b2b", paddingTop: 20, marginBottom: 24 }}>
-              <h2 className="font-space-mono" style={{ fontSize: 11, fontWeight: 700, color: "#4b5563", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+              <h2 className="font-sora" style={{ fontSize: 11, fontWeight: 700, color: "#4b5563", letterSpacing: "0.12em", textTransform: "uppercase" }}>
                 Social Media
               </h2>
             </div>
-            <ul className="font-inter" style={{ display: "flex", flexDirection: "column", gap: 7, fontSize: 14, listStyle: "none", padding: 0, margin: 0, lineHeight: 1.5 }}>
+            <ul className="font-sora" style={{ display: "flex", flexDirection: "column", gap: 7, fontSize: 14, listStyle: "none", padding: 0, margin: 0, lineHeight: 1.5 }}>
               <li><ExternalLink href="https://www.instagram.com/photo.bymenghour/">Instagram</ExternalLink></li>
               <li><ExternalLink href="https://www.linkedin.com/in/menghour-lao/">LinkedIn</ExternalLink></li>
               <li><ExternalLink href="https://medium.com/@menghour_lao">Medium</ExternalLink></li>
@@ -250,11 +250,11 @@ const Index = () => {
           {/* Bio */}
           <div data-animate style={{ "--reveal-delay": "0.2s" } as React.CSSProperties}>
             <div style={{ borderTop: "1px solid #2b2b2b", paddingTop: 20, marginBottom: 24 }}>
-              <h2 className="font-space-mono" style={{ fontSize: 11, fontWeight: 700, color: "#4b5563", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+              <h2 className="font-sora" style={{ fontSize: 11, fontWeight: 700, color: "#4b5563", letterSpacing: "0.12em", textTransform: "uppercase" }}>
                 Bio
               </h2>
             </div>
-            <div className="font-inter" style={{ display: "flex", flexDirection: "column", gap: 16, fontSize: 14, color: "#d1d5db", lineHeight: 1.75 }}>
+            <div className="font-sora" style={{ display: "flex", flexDirection: "column", gap: 16, fontSize: 14, color: "#d1d5db", lineHeight: 1.75 }}>
               <p>I'm a product designer from Cambodia delivering best-in-class digital experiences for startups and growth-stage companies.</p>
               <p>Over 7 years, I've helped companies across Southeast Asia turn ambitious ideas into elegant, considered digital products — from zero-to-one apps to scaled design systems.</p>
               <p>When I'm not designing, I'm out capturing streets with my camera or writing stories. I love the craft of visual storytelling in all its forms.</p>
@@ -289,7 +289,7 @@ const Index = () => {
 
         {/* Bottom bar */}
         <div
-          className="px-6 md:px-14 lg:px-[104px] font-inter"
+          className="px-6 md:px-14 lg:px-[104px] font-sora"
           style={{
             borderTop: "1px solid #1a1a1a",
             paddingTop: 20,

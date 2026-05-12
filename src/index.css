@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Anton&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@100;200;300;400;500;600;700;800&family=Anton&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -92,7 +92,7 @@
   }
 
   body {
-    @apply bg-background text-foreground font-inter antialiased;
+    @apply bg-background text-foreground font-sora antialiased;
     border-radius: 0;
   }
 }
@@ -203,7 +203,7 @@ html {
 @layer components {
   /* Nav / footer text links — 1px underline on hover */
   .link-underline {
-    @apply relative inline-block font-inter font-medium;
+    @apply relative inline-block font-sora font-medium;
     font-size: 14px;
     letter-spacing: normal;
   }
