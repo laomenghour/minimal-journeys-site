@@ -1,8 +1,15 @@
 import { useRef, useEffect, useState } from "react";
 import ExternalLink from "@/components/ExternalLink";
 import profileImg from "@/assets/mh_profile.png";
+import coffeeDesign from "@/assets/coffee-design.svg";
+import coffeeWriting from "@/assets/coffee-writing.svg";
+import photographyIcon from "@/assets/photography.svg";
+import creativeColor from "@/assets/creative-color.svg";
+import coffeeColor from "@/assets/coffee-color.svg";
+import photographyColor from "@/assets/photography-color.svg";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { useLenis } from "@/hooks/useLenis";
+import { useGeolocationGreeting } from "@/hooks/useGeolocationGreeting";
 
 const designProjects = [
   { name: "BookMe+", tag: "Present" },
@@ -33,6 +40,7 @@ const Index = () => {
   const [inView, setInView]               = useState(false);
   const [projectsVisible, setProjectsVisible] = useState(false);
   const [hovered, setHovered]             = useState<string | null>(null);
+  const geo = useGeolocationGreeting();
 
   // Background colour transition (black → white)
   useEffect(() => {
@@ -72,10 +80,13 @@ const Index = () => {
       {/* ── Hero — Ink Black ── */}
       <div
         className="min-h-screen flex flex-col px-6 py-6 md:px-14 md:py-6 lg:px-[104px]"
-        style={{ background: "#111111", color: "#ffffff" }}
+        style={{ background: "#111111", color: "#ffffff", position: "relative" }}
       >
-        <nav className="hero-nav flex items-center justify-between py-4" aria-label="Main navigation">
+        <nav className="hero-nav flex items-center py-4" aria-label="Main navigation" style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "center" }}>
+          {/* Left — logo */}
           <img src={profileImg} alt="Menghour" className="w-12 h-12" style={{ borderRadius: 0 }} />
+
+          {/* Centre — nav links */}
           <div style={{ display: "flex", gap: 32 }}>
             {[
               { label: "Work",     ref: designRef },
@@ -87,7 +98,7 @@ const Index = () => {
                   const top = (ref.current?.getBoundingClientRect().top ?? 0) + window.scrollY;
                   window.scrollTo({ top, behavior: "smooth" });
                 }}
-                className="font-sora link-underline"
+                className="font-dm-mono link-underline"
                 style={{
                   background: "none",
                   border: "none",
@@ -103,12 +114,28 @@ const Index = () => {
               </button>
             ))}
           </div>
+
+          {/* Right — geolocation greeting */}
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <p
+              className="font-dm-mono"
+              style={{
+                fontSize: 14,
+                fontWeight: 500,
+                color: "#ffffff",
+                opacity: geo.loading ? 0 : 1,
+                transition: "opacity 0.4s ease",
+              }}
+            >
+              {geo.greeting}, Welcome to my portfolio
+            </p>
+          </div>
         </nav>
 
         <main className="flex flex-1 flex-col justify-center" style={{ paddingTop: 56, paddingBottom: 56 }}>
           {/* Eyebrow — clips up */}
           <div className="hero-mask" style={{ marginBottom: 24 }}>
-            <p className="hero-item delay-1 font-sora" style={{ fontSize: 16, fontWeight: 500, color: "#6b7280" }}>
+            <p className="hero-item delay-1 font-dm-mono" style={{ fontSize: 16, fontWeight: 500, color: "#6b7280" }}>
               Product Designer · Cambodia
             </p>
           </div>
@@ -125,11 +152,50 @@ const Index = () => {
 
           {/* Subtext — clips up */}
           <div className="hero-mask" style={{ marginTop: 24 }}>
-            <p className="hero-item delay-3 font-sora" style={{ fontSize: 26, fontWeight: 500, color: "#6b7280", lineHeight: 1.15 }}>
+            <p className="hero-item delay-3 font-dm-mono" style={{ fontSize: 26, fontWeight: 500, color: "#6b7280", lineHeight: 1.15 }}>
               From Cambodia to the world.
             </p>
           </div>
         </main>
+
+        {/* Icon badges — absolute bottom-right, matching reference */}
+        <div
+          className="hero-item delay-4"
+          style={{ position: "absolute", bottom: 48, right: 104, display: "flex", gap: 28 }}
+        >
+          {[
+            { outline: coffeeDesign,    color: creativeColor,    label: "Design",      size: 96,  offset: 20, tip: "Creativity Keeps Me Going"  },
+            { outline: photographyIcon, color: photographyColor, label: "Photography", size: 115, offset: -8, tip: "Capturing Moments I Love"    },
+            { outline: coffeeWriting,   color: coffeeColor,      label: "Writing",     size: 96,  offset: 10, tip: "Coffee Before Everything"    },
+          ].map(({ outline, color, label, size, offset, tip }) => (
+            <div key={label} style={{ transform: `translateY(${offset}px)` }}>
+            <div className="icon-wrap" style={{ position: "relative", width: size, height: size }}>
+              <img
+                src={outline}
+                alt={label}
+                style={{
+                  width: size, height: size, objectFit: "contain",
+                  position: "absolute", inset: 0,
+                  transition: "opacity 0.25s ease",
+                }}
+                className="icon-outline"
+              />
+              <img
+                src={color}
+                alt=""
+                style={{
+                  width: size, height: size, objectFit: "contain",
+                  position: "absolute", inset: 0,
+                  opacity: 0,
+                  transition: "opacity 0.25s ease",
+                }}
+                className="icon-color"
+              />
+              <span className="icon-tip">{tip}</span>
+            </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* ── UX/UI Design — Canvas White (scroll reveal) ── */}
@@ -146,7 +212,7 @@ const Index = () => {
       >
         <p
           data-animate
-          className="font-sora mb-14"
+          className="font-dm-mono mb-14"
           style={{ fontSize: 26, fontWeight: 500, color: inView ? "#111111" : "#4b5563", transition: "color 0.8s ease" }}
         >
           UX/UI Design
@@ -200,7 +266,7 @@ const Index = () => {
                   </span>
                   {name}
                   {tag && (
-                    <span className="font-sora" style={{ fontSize: 14, fontWeight: 500, letterSpacing: "0.05em", textTransform: "uppercase", color: inView ? "#6b7280" : "#4b5563", transition: "color 0.8s ease" }}>
+                    <span className="font-dm-mono" style={{ fontSize: 14, fontWeight: 500, letterSpacing: "0.05em", textTransform: "uppercase", color: inView ? "#6b7280" : "#4b5563", transition: "color 0.8s ease" }}>
                       {tag}
                     </span>
                   )}
@@ -223,11 +289,11 @@ const Index = () => {
           {/* Services */}
           <div data-animate style={{ "--reveal-delay": "0s" } as React.CSSProperties}>
             <div style={{ borderTop: "1px solid #2b2b2b", paddingTop: 20, marginBottom: 24 }}>
-              <h2 className="font-sora" style={{ fontSize: 11, fontWeight: 700, color: "#4b5563", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+              <h2 className="font-dm-mono" style={{ fontSize: 11, fontWeight: 700, color: "#4b5563", letterSpacing: "0.12em", textTransform: "uppercase" }}>
                 Skills
               </h2>
             </div>
-            <ul className="font-sora" style={{ display: "flex", flexDirection: "column", gap: 7, fontSize: 14, color: "#d1d5db", listStyle: "none", padding: 0, margin: 0, lineHeight: 1.5 }}>
+            <ul className="font-dm-mono" style={{ display: "flex", flexDirection: "column", gap: 7, fontSize: 14, color: "#d1d5db", listStyle: "none", padding: 0, margin: 0, lineHeight: 1.5 }}>
               {services.map((s) => <li key={s}>{s}</li>)}
             </ul>
           </div>
@@ -235,11 +301,11 @@ const Index = () => {
           {/* Social Media */}
           <div data-animate style={{ "--reveal-delay": "0.1s" } as React.CSSProperties}>
             <div style={{ borderTop: "1px solid #2b2b2b", paddingTop: 20, marginBottom: 24 }}>
-              <h2 className="font-sora" style={{ fontSize: 11, fontWeight: 700, color: "#4b5563", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+              <h2 className="font-dm-mono" style={{ fontSize: 11, fontWeight: 700, color: "#4b5563", letterSpacing: "0.12em", textTransform: "uppercase" }}>
                 Social Media
               </h2>
             </div>
-            <ul className="font-sora" style={{ display: "flex", flexDirection: "column", gap: 7, fontSize: 14, listStyle: "none", padding: 0, margin: 0, lineHeight: 1.5 }}>
+            <ul className="font-dm-mono" style={{ display: "flex", flexDirection: "column", gap: 7, fontSize: 14, listStyle: "none", padding: 0, margin: 0, lineHeight: 1.5 }}>
               <li><ExternalLink href="https://www.instagram.com/photo.bymenghour/">Instagram</ExternalLink></li>
               <li><ExternalLink href="https://www.linkedin.com/in/menghour-lao/">LinkedIn</ExternalLink></li>
               <li><ExternalLink href="https://medium.com/@menghour_lao">Medium</ExternalLink></li>
@@ -250,11 +316,11 @@ const Index = () => {
           {/* Bio */}
           <div data-animate style={{ "--reveal-delay": "0.2s" } as React.CSSProperties}>
             <div style={{ borderTop: "1px solid #2b2b2b", paddingTop: 20, marginBottom: 24 }}>
-              <h2 className="font-sora" style={{ fontSize: 11, fontWeight: 700, color: "#4b5563", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+              <h2 className="font-dm-mono" style={{ fontSize: 11, fontWeight: 700, color: "#4b5563", letterSpacing: "0.12em", textTransform: "uppercase" }}>
                 Bio
               </h2>
             </div>
-            <div className="font-sora" style={{ display: "flex", flexDirection: "column", gap: 16, fontSize: 14, color: "#d1d5db", lineHeight: 1.75 }}>
+            <div className="font-dm-mono" style={{ display: "flex", flexDirection: "column", gap: 16, fontSize: 14, color: "#d1d5db", lineHeight: 1.75 }}>
               <p>I'm a product designer from Cambodia delivering best-in-class digital experiences for startups and growth-stage companies.</p>
               <p>Over 7 years, I've helped companies across Southeast Asia turn ambitious ideas into elegant, considered digital products — from zero-to-one apps to scaled design systems.</p>
               <p>When I'm not designing, I'm out capturing streets with my camera or writing stories. I love the craft of visual storytelling in all its forms.</p>
@@ -289,7 +355,7 @@ const Index = () => {
 
         {/* Bottom bar */}
         <div
-          className="px-6 md:px-14 lg:px-[104px] font-sora"
+          className="px-6 md:px-14 lg:px-[104px] font-dm-mono"
           style={{
             borderTop: "1px solid #1a1a1a",
             paddingTop: 20,

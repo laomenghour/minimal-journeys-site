@@ -15,7 +15,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        sora: ["Sora", "sans-serif"],
+        "dm-mono": ["DM Mono", "monospace"],
         anton: ["Anton", "sans-serif"],
       },
       colors: {
