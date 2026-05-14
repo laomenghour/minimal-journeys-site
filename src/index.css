@@ -103,6 +103,7 @@
 html {
   scroll-behavior: smooth;
   cursor: none;
+  background: #ffffff; /* white mask visible outside the clip during circle-reveal */
 }
 
 * {
@@ -145,6 +146,19 @@ html {
   to   { transform: translateY(0); }
 }
 
+/* ─────────────────────────────────────────
+   Intro — circle reveal (center-out)
+───────────────────────────────────────── */
+@keyframes circle-reveal {
+  from { clip-path: circle(0%   at 50% 50%); }
+  to   { clip-path: circle(150% at 50% 50%); }
+}
+
+.page-reveal {
+  /* fill:both → clipped to 0% before delay fires, stays at 150% after done */
+  animation: circle-reveal 1.4s cubic-bezier(0.65, 0, 0.35, 1) 0.2s both;
+}
+
 /* Every hero text element clips up from its own mask */
 .hero-mask {
   overflow: hidden;
@@ -153,7 +167,8 @@ html {
 
 .hero-nav {
   animation: fade-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
-  animation-delay: 0.05s;
+  /* circle = 0.2s delay + 1.4s = 1.6s total; nav fires 0.05s after */
+  animation-delay: 1.65s;
 }
 
 /* Items inside .hero-mask animate with clip-up */
@@ -162,15 +177,20 @@ html {
   animation: clip-up 1s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.hero-mask:nth-of-type(1) .hero-item { animation-delay: 0.15s; }
-.hero-mask:nth-of-type(2) .hero-item { animation-delay: 0.30s; }
-.hero-mask:nth-of-type(3) .hero-item { animation-delay: 0.50s; }
+.hero-mask:nth-of-type(1) .hero-item { animation-delay: 1.75s; }
+.hero-mask:nth-of-type(2) .hero-item { animation-delay: 1.90s; }
+.hero-mask:nth-of-type(3) .hero-item { animation-delay: 2.10s; }
 
-/* Explicit delay helpers used inline */
-.delay-1 { animation-delay: 0.15s; }
-.delay-2 { animation-delay: 0.32s; }
-.delay-3 { animation-delay: 0.52s; }
-.delay-4 { animation-delay: 0.70s; }
+/* Explicit delay helpers used inline — offset by circle-reveal duration (1.6s) */
+.delay-1 { animation-delay: 1.75s; }
+.delay-2 { animation-delay: 1.90s; }
+.delay-3 { animation-delay: 2.10s; }
+.delay-4 { animation-delay: 2.30s; }
+
+/* Icon staggered fade-in — applied per-icon with an inline animationDelay */
+.icon-animate {
+  animation: fade-in 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
 
 /* ─────────────────────────────────────────
    Scroll reveal — base state
@@ -241,6 +261,44 @@ html {
   }
 }
 
+/* ─────────────────────────────────────────
+   Mobile menu — slide-in animation
+───────────────────────────────────────── */
+@keyframes menu-down {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.mobile-menu-enter {
+  animation: menu-down 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ─────────────────────────────────────────
+   Hero icons — desktop only
+───────────────────────────────────────── */
+.hero-icons {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .hero-icons {
+    position: absolute;
+    display: flex;
+    bottom: 48px;
+    right: 104px;
+    gap: 28px;
+  }
+}
+
+/* ─────────────────────────────────────────
+   Mobile — cursor restore
+───────────────────────────────────────── */
+@media (max-width: 1023px) {
+  html, * {
+    cursor: auto !important;
+  }
+}
+
 /* Icon hover — smooth like butter */
 .icon-wrap {
   transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -276,4 +334,15 @@ html {
 .icon-wrap:hover .icon-tip {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
+}
+
+/* On mobile, left-align tooltips so they don't bleed off the left edge */
+@media (max-width: 767px) {
+  .icon-wrap .icon-tip {
+    left: 0;
+    transform: translateY(10px);
+  }
+  .icon-wrap:hover .icon-tip {
+    transform: translateY(0);
+  }
 }

@@ -1,0 +1,19 @@
+{
+  "name": "Menghour — Builder & Creative from Cambodia",
+  "short_name": "Menghour",
+  "description": "Product designer with 7+ years of experience turning ambitious ideas into elegant digital products.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#111111",
+  "theme_color": "#111111",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["portfolio", "design", "business"]
+}

@@ -23,12 +23,18 @@ const H = MAP.length * P;
 
 export default function PixelCursor() {
   const [pos, setPos] = useState({ x: -100, y: -100 });
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    // Don't show on touch/mobile devices — they have no real cursor
+    if (window.matchMedia("(pointer: coarse)").matches) return;
+    setVisible(true);
     const move = (e: MouseEvent) => setPos({ x: e.clientX, y: e.clientY });
     window.addEventListener("mousemove", move);
     return () => window.removeEventListener("mousemove", move);
   }, []);
+
+  if (!visible) return null;
 
   return (
     <svg

@@ -1,3 +1,9 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://menghour.lovable.app/sitemap.xml
+
+# Search engine crawlers
 User-agent: Googlebot
 Allow: /
 
@@ -10,5 +16,27 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
-User-agent: *
+User-agent: Applebot
+Allow: /
+
+# AI answer engine crawlers
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Anthropic-AI
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: cohere-ai
 Allow: /

@@ -6,6 +6,7 @@ import coffeeWriting from "@/assets/coffee-writing.svg";
 import photographyIcon from "@/assets/photography.svg";
 import creativeColor from "@/assets/creative-color.svg";
 import coffeeColor from "@/assets/coffee-color.svg";
+import arrowIcon from "@/assets/arrow.svg";
 import photographyColor from "@/assets/photography-color.svg";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { useLenis } from "@/hooks/useLenis";
@@ -33,13 +34,25 @@ const services = [
   "Product Psychology",
 ];
 
+const iconItems = [
+  { outline: coffeeDesign,    color: creativeColor,    label: "Design",      size: 96,  mobileSize: 68, offset: 20,  mobileOffset: 14, tip: "Creativity Keeps Me Going" },
+  { outline: photographyIcon, color: photographyColor, label: "Photography", size: 115, mobileSize: 80, offset: -8,  mobileOffset: -6, tip: "Capturing Moments I Love"   },
+  { outline: coffeeWriting,   color: coffeeColor,      label: "Writing",     size: 96,  mobileSize: 68, offset: 10,  mobileOffset: 8,  tip: "Coffee Before Everything"  },
+];
+
+const navLinks = (designRef: React.RefObject<HTMLElement | null>, footerRef: React.RefObject<HTMLElement | null>) => [
+  { label: "Work",     ref: designRef },
+  { label: "About Me", ref: footerRef },
+];
+
 const Index = () => {
   const designRef    = useRef<HTMLElement>(null);
   const projectsRef  = useRef<HTMLDivElement>(null);
   const footerRef    = useRef<HTMLElement>(null);
-  const [inView, setInView]               = useState(false);
+  const [inView, setInView]                   = useState(false);
   const [projectsVisible, setProjectsVisible] = useState(false);
-  const [hovered, setHovered]             = useState<string | null>(null);
+  const [hovered, setHovered]                 = useState<string | null>(null);
+  const [menuOpen, setMenuOpen]               = useState(false);
   const geo = useGeolocationGreeting();
 
   // Background colour transition (black → white)
@@ -71,8 +84,17 @@ const Index = () => {
     return () => obs.disconnect();
   }, []);
 
+  // Close mobile menu on resize to md+
+  useEffect(() => {
+    const onResize = () => { if (window.innerWidth >= 768) setMenuOpen(false); };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
   useScrollReveal();
   useLenis();
+
+  const links = navLinks(designRef, footerRef);
 
   return (
     <div className="flex flex-col" style={{ borderRadius: 0 }}>
@@ -82,16 +104,36 @@ const Index = () => {
         className="min-h-screen flex flex-col px-6 py-6 md:px-14 md:py-6 lg:px-[104px]"
         style={{ background: "#111111", color: "#ffffff", position: "relative" }}
       >
-        <nav className="hero-nav flex items-center py-4" aria-label="Main navigation" style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "center" }}>
-          {/* Left — logo */}
-          <img src={profileImg} alt="Menghour" className="w-12 h-12" style={{ borderRadius: 0 }} />
 
-          {/* Centre — nav links */}
-          <div style={{ display: "flex", gap: 32 }}>
-            {[
-              { label: "Work",     ref: designRef },
-              { label: "About Me", ref: footerRef },
-            ].map(({ label, ref }) => (
+        {/* ── Nav ── */}
+        <nav
+          className="hero-nav relative flex items-center justify-between py-3 md:py-4"
+          aria-label="Main navigation"
+        >
+          {/* Left — logo */}
+          <img src={profileImg} alt="Menghour" className="w-10 h-10 md:w-12 md:h-12" style={{ borderRadius: 0 }} />
+
+          {/* Mobile centre — greeting (absolutely centred) */}
+          <p
+            className="md:hidden absolute left-1/2 -translate-x-1/2 font-dm-mono"
+            style={{
+              fontSize: 12,
+              fontWeight: 500,
+              color: "#ffffff",
+              whiteSpace: "nowrap",
+              maxWidth: "58vw",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              opacity: geo.loading ? 0 : 1,
+              transition: "opacity 0.4s ease",
+            }}
+          >
+            {geo.greeting}, Welcome to my portfolio
+          </p>
+
+          {/* Desktop centre — nav links (absolutely centred) */}
+          <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center" style={{ gap: 28 }}>
+            {links.map(({ label, ref }) => (
               <button
                 key={label}
                 onClick={() => {
@@ -115,105 +157,182 @@ const Index = () => {
             ))}
           </div>
 
-          {/* Right — geolocation greeting */}
-          <div style={{ display: "flex", justifyContent: "flex-end" }}>
-            <p
-              className="font-dm-mono"
-              style={{
-                fontSize: 14,
-                fontWeight: 500,
-                color: "#ffffff",
-                opacity: geo.loading ? 0 : 1,
-                transition: "opacity 0.4s ease",
-              }}
-            >
-              {geo.greeting}, Welcome to my portfolio
-            </p>
-          </div>
+          {/* Mobile right — hamburger */}
+          <button
+            className="md:hidden flex items-center justify-center"
+            onClick={() => setMenuOpen((o) => !o)}
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            style={{ background: "none", border: "none", color: "#ffffff", padding: 4, cursor: "pointer" }}
+          >
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              {menuOpen ? (
+                <>
+                  <line x1="5" y1="5" x2="17" y2="17" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+                  <line x1="17" y1="5" x2="5" y2="17" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+                </>
+              ) : (
+                <>
+                  <line x1="3" y1="6"  x2="19" y2="6"  stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+                  <line x1="3" y1="11" x2="19" y2="11" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+                  <line x1="3" y1="16" x2="19" y2="16" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+                </>
+              )}
+            </svg>
+          </button>
+
+          {/* Desktop right — greeting */}
+          <p
+            className="hidden md:block font-dm-mono"
+            style={{
+              fontSize: 14,
+              fontWeight: 500,
+              color: "#ffffff",
+              opacity: geo.loading ? 0 : 1,
+              transition: "opacity 0.4s ease",
+            }}
+          >
+            {geo.greeting}, Welcome to my portfolio
+          </p>
         </nav>
 
-        <main className="flex flex-1 flex-col justify-center" style={{ paddingTop: 56, paddingBottom: 56 }}>
-          {/* Eyebrow — clips up */}
-          <div className="hero-mask" style={{ marginBottom: 24 }}>
-            <p className="hero-item delay-1 font-dm-mono" style={{ fontSize: 16, fontWeight: 500, color: "#6b7280" }}>
+        {/* ── Mobile dropdown menu ── */}
+        <div
+          className={`md:hidden ${menuOpen ? "mobile-menu-enter" : ""}`}
+          style={{
+            display: menuOpen ? "flex" : "none",
+            flexDirection: "column",
+            borderTop: "1px solid #1a1a1a",
+            marginBottom: 8,
+          }}
+        >
+          {links.map(({ label, ref }) => (
+            <button
+              key={label}
+              onClick={() => {
+                setMenuOpen(false);
+                setTimeout(() => {
+                  const top = (ref.current?.getBoundingClientRect().top ?? 0) + window.scrollY;
+                  window.scrollTo({ top, behavior: "smooth" });
+                }, 80);
+              }}
+              className="font-dm-mono"
+              style={{
+                background: "none",
+                border: "none",
+                borderBottom: "1px solid #1a1a1a",
+                color: "#ffffff",
+                fontSize: 15,
+                fontWeight: 500,
+                cursor: "pointer",
+                padding: "14px 0",
+                textAlign: "left",
+                width: "100%",
+                letterSpacing: "normal",
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* ── Hero main content ── */}
+        <main className="flex flex-1 flex-col justify-center py-8 md:py-14">
+          {/* Eyebrow */}
+          <div className="hero-mask" style={{ marginBottom: 16 }}>
+            <p className="hero-item delay-1 font-dm-mono" style={{ fontSize: 15, fontWeight: 500, color: "#6b7280" }}>
               Product Designer · Cambodia
             </p>
           </div>
 
-          {/* Headline — clips up */}
+          {/* Headline */}
           <div className="hero-mask">
             <h1
               className="hero-item delay-2 font-anton"
-              style={{ fontSize: "clamp(64px, 10.5vw, 180px)", lineHeight: 0.95, letterSpacing: "-0.04em", color: "#ffffff" }}
+              style={{ fontSize: "clamp(54px, 10.5vw, 180px)", lineHeight: 0.95, letterSpacing: "-0.04em", color: "#ffffff" }}
             >
               7 Years of Turning Ideas into Startup Products
             </h1>
           </div>
 
-          {/* Subtext — clips up */}
-          <div className="hero-mask" style={{ marginTop: 24 }}>
-            <p className="hero-item delay-3 font-dm-mono" style={{ fontSize: 26, fontWeight: 500, color: "#6b7280", lineHeight: 1.15 }}>
+          {/* Subtext */}
+          <div className="hero-mask" style={{ marginTop: 18 }}>
+            <p className="hero-item delay-3 font-dm-mono" style={{ fontSize: "clamp(18px, 3.5vw, 26px)", fontWeight: 500, color: "#6b7280", lineHeight: 1.15 }}>
               From Cambodia to the world.
             </p>
           </div>
+
+          {/* Mobile icons — inline below subtext, hidden on md+ */}
+          <div className="flex md:hidden items-end" style={{ gap: 16, marginTop: 32 }}>
+            {iconItems.map(({ outline, color, label, mobileSize: size, mobileOffset: offset, tip }, i) => (
+              <div
+                key={`m-${label}`}
+                className="icon-animate"
+                style={{ transform: `translateY(${offset}px)`, animationDelay: `${2.30 + i * 0.15}s` }}
+              >
+                <div className="icon-wrap" style={{ position: "relative", width: size, height: size }}>
+                  <img
+                    src={outline}
+                    alt={label}
+                    style={{ width: size, height: size, objectFit: "contain", position: "absolute", inset: 0, transition: "opacity 0.25s ease" }}
+                    className="icon-outline"
+                  />
+                  <img
+                    src={color}
+                    alt=""
+                    style={{ width: size, height: size, objectFit: "contain", position: "absolute", inset: 0, opacity: 0, transition: "opacity 0.25s ease" }}
+                    className="icon-color"
+                  />
+                  <span className="icon-tip">{tip}</span>
+                </div>
+              </div>
+            ))}
+          </div>
         </main>
 
-        {/* Icon badges — absolute bottom-right, matching reference */}
-        <div
-          className="hero-item delay-4"
-          style={{ position: "absolute", bottom: 48, right: 104, display: "flex", gap: 28 }}
-        >
-          {[
-            { outline: coffeeDesign,    color: creativeColor,    label: "Design",      size: 96,  offset: 20, tip: "Creativity Keeps Me Going"  },
-            { outline: photographyIcon, color: photographyColor, label: "Photography", size: 115, offset: -8, tip: "Capturing Moments I Love"    },
-            { outline: coffeeWriting,   color: coffeeColor,      label: "Writing",     size: 96,  offset: 10, tip: "Coffee Before Everything"    },
-          ].map(({ outline, color, label, size, offset, tip }) => (
-            <div key={label} style={{ transform: `translateY(${offset}px)` }}>
-            <div className="icon-wrap" style={{ position: "relative", width: size, height: size }}>
-              <img
-                src={outline}
-                alt={label}
-                style={{
-                  width: size, height: size, objectFit: "contain",
-                  position: "absolute", inset: 0,
-                  transition: "opacity 0.25s ease",
-                }}
-                className="icon-outline"
-              />
-              <img
-                src={color}
-                alt=""
-                style={{
-                  width: size, height: size, objectFit: "contain",
-                  position: "absolute", inset: 0,
-                  opacity: 0,
-                  transition: "opacity 0.25s ease",
-                }}
-                className="icon-color"
-              />
-              <span className="icon-tip">{tip}</span>
-            </div>
+        {/* Desktop icon badges — absolute bottom-right, lg+ only */}
+        <div className="hero-icons">
+          {iconItems.map(({ outline, color, label, size, offset, tip }, i) => (
+            <div
+              key={label}
+              className="icon-animate"
+              style={{ transform: `translateY(${offset}px)`, animationDelay: `${2.30 + i * 0.15}s` }}
+            >
+              <div className="icon-wrap" style={{ position: "relative", width: size, height: size }}>
+                <img
+                  src={outline}
+                  alt={label}
+                  style={{ width: size, height: size, objectFit: "contain", position: "absolute", inset: 0, transition: "opacity 0.25s ease" }}
+                  className="icon-outline"
+                />
+                <img
+                  src={color}
+                  alt=""
+                  style={{ width: size, height: size, objectFit: "contain", position: "absolute", inset: 0, opacity: 0, transition: "opacity 0.25s ease" }}
+                  className="icon-color"
+                />
+                <span className="icon-tip">{tip}</span>
+              </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* ── UX/UI Design — Canvas White (scroll reveal) ── */}
+      {/* ── UX/UI Design — Canvas White ── */}
       <section
         ref={designRef}
-        className="min-h-screen flex flex-col px-6 py-6 md:px-14 lg:px-[104px]"
+        className="lg:min-h-screen flex flex-col px-6 md:px-14 lg:px-[104px]"
         style={{
           backgroundColor: inView ? "#ffffff" : "#111111",
           color: inView ? "#000000" : "#ffffff",
           transition: "background-color 0.8s ease, color 0.8s ease",
-          paddingTop: 56,
-          paddingBottom: 56,
+          paddingTop: 48,
+          paddingBottom: 48,
         }}
       >
         <p
           data-animate
-          className="font-dm-mono mb-14"
-          style={{ fontSize: 26, fontWeight: 500, color: inView ? "#111111" : "#4b5563", transition: "color 0.8s ease" }}
+          className="font-dm-mono mb-8 md:mb-14"
+          style={{ fontSize: "clamp(15px, 3.5vw, 26px)", fontWeight: 500, color: inView ? "#111111" : "#4b5563", transition: "color 0.8s ease" }}
         >
           UX/UI Design
         </p>
@@ -227,10 +346,9 @@ const Index = () => {
                 borderTop: `1px solid ${inView ? "#e5e7eb" : "#1a1a1a"}`,
                 transition: "border-color 0.8s ease",
                 cursor: "default",
-                overflow: "hidden",        // clip mask lives here
+                overflow: "hidden",
               }}
             >
-              {/* This div is what clips up — transform moves it, parent clips it */}
               <div
                 style={{
                   transform: projectsVisible ? "translateY(0)" : "translateY(112%)",
@@ -241,14 +359,14 @@ const Index = () => {
                 <span
                   className="font-anton"
                   style={{
-                    fontSize: "clamp(40px, 6.5vw, 86px)",
+                    fontSize: "clamp(28px, 6.5vw, 86px)",
                     lineHeight: 1.05,
                     letterSpacing: "-0.033em",
-                    paddingTop: 12,
-                    paddingBottom: 12,
+                    paddingTop: 10,
+                    paddingBottom: 10,
                     display: "flex",
                     alignItems: "baseline",
-                    gap: 16,
+                    gap: 12,
                     position: "relative",
                     opacity: hovered && hovered !== name ? 0.25 : 1,
                     transition: "opacity 0.3s ease",
@@ -266,7 +384,7 @@ const Index = () => {
                   </span>
                   {name}
                   {tag && (
-                    <span className="font-dm-mono" style={{ fontSize: 14, fontWeight: 500, letterSpacing: "0.05em", textTransform: "uppercase", color: inView ? "#6b7280" : "#4b5563", transition: "color 0.8s ease" }}>
+                    <span className="font-dm-mono" style={{ fontSize: 12, fontWeight: 500, letterSpacing: "0.05em", textTransform: "uppercase", color: inView ? "#6b7280" : "#4b5563", transition: "color 0.8s ease" }}>
                       {tag}
                     </span>
                   )}
@@ -278,17 +396,17 @@ const Index = () => {
         </div>
       </section>
 
-{/* ── Footer — Enhanced ── */}
+      {/* ── Footer ── */}
       <footer ref={footerRef} className="footer-dark" style={{ background: "#111111", borderTop: "1px solid #1a1a1a" }}>
 
         {/* 3-column grid */}
         <div
           className="grid grid-cols-1 md:grid-cols-3 px-6 md:px-14 lg:px-[104px]"
-          style={{ paddingTop: 56, paddingBottom: 56, gap: 48 }}
+          style={{ paddingTop: 48, paddingBottom: 48, gap: 40 }}
         >
-          {/* Services */}
+          {/* Skills */}
           <div data-animate style={{ "--reveal-delay": "0s" } as React.CSSProperties}>
-            <div style={{ borderTop: "1px solid #2b2b2b", paddingTop: 20, marginBottom: 24 }}>
+            <div style={{ borderTop: "1px solid #2b2b2b", paddingTop: 20, marginBottom: 20 }}>
               <h2 className="font-dm-mono" style={{ fontSize: 11, fontWeight: 700, color: "#4b5563", letterSpacing: "0.12em", textTransform: "uppercase" }}>
                 Skills
               </h2>
@@ -300,7 +418,7 @@ const Index = () => {
 
           {/* Social Media */}
           <div data-animate style={{ "--reveal-delay": "0.1s" } as React.CSSProperties}>
-            <div style={{ borderTop: "1px solid #2b2b2b", paddingTop: 20, marginBottom: 24 }}>
+            <div style={{ borderTop: "1px solid #2b2b2b", paddingTop: 20, marginBottom: 20 }}>
               <h2 className="font-dm-mono" style={{ fontSize: 11, fontWeight: 700, color: "#4b5563", letterSpacing: "0.12em", textTransform: "uppercase" }}>
                 Social Media
               </h2>
@@ -315,15 +433,15 @@ const Index = () => {
 
           {/* Bio */}
           <div data-animate style={{ "--reveal-delay": "0.2s" } as React.CSSProperties}>
-            <div style={{ borderTop: "1px solid #2b2b2b", paddingTop: 20, marginBottom: 24 }}>
+            <div style={{ borderTop: "1px solid #2b2b2b", paddingTop: 20, marginBottom: 20 }}>
               <h2 className="font-dm-mono" style={{ fontSize: 11, fontWeight: 700, color: "#4b5563", letterSpacing: "0.12em", textTransform: "uppercase" }}>
                 Bio
               </h2>
             </div>
-            <div className="font-dm-mono" style={{ display: "flex", flexDirection: "column", gap: 16, fontSize: 14, color: "#d1d5db", lineHeight: 1.75 }}>
-              <p>I'm a product designer from Cambodia delivering best-in-class digital experiences for startups and growth-stage companies.</p>
-              <p>Over 7 years, I've helped companies across Southeast Asia turn ambitious ideas into elegant, considered digital products — from zero-to-one apps to scaled design systems.</p>
-              <p>When I'm not designing, I'm out capturing streets with my camera or writing stories. I love the craft of visual storytelling in all its forms.</p>
+            <div className="font-dm-mono" style={{ display: "flex", flexDirection: "column", gap: 14, fontSize: 14, color: "#d1d5db", lineHeight: 1.75 }}>
+              <p>I'm a product designer and creative director from Phnom Penh, Cambodia. I work with startups and growth-stage companies to build digital products that are both beautiful and scalable.</p>
+              <p>Over 7 years, I've shipped products across Southeast Asia — from zero-to-one mobile apps to design systems serving hundreds of thousands of users. My work spans UI/UX, branding, and creative direction.</p>
+              <p>Outside of design, I'm a street photographer documenting life on the streets of Phnom Penh, and a writer exploring visual storytelling on Medium.</p>
             </div>
           </div>
         </div>
@@ -332,24 +450,36 @@ const Index = () => {
         <div
           data-animate
           className="px-6 md:px-14 lg:px-[104px]"
-          style={{ paddingBottom: 48, "--reveal-delay": "0.15s" } as React.CSSProperties}
+          style={{ paddingBottom: 40, "--reveal-delay": "0.15s" } as React.CSSProperties}
         >
           <a
             href="mailto:laomenghour@gmail.com"
             className="font-anton"
             style={{
-              fontSize: "clamp(32px, 6.5vw, 110px)",
+              fontSize: "clamp(28px, 6.5vw, 110px)",
               lineHeight: 1,
               letterSpacing: "-0.03em",
               color: "#ffffff",
               textDecoration: "none",
-              display: "block",
+              display: "flex",
+              alignItems: "flex-end",
+              gap: "0.2em",
               transition: "opacity 0.25s ease",
             }}
             onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.5")}
             onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
           >
-            laomenghour@gmail.com
+            <span style={{ wordBreak: "break-all" }}>laomenghour@gmail.com</span>
+            <img
+              src={arrowIcon}
+              alt=""
+              style={{
+                height: "0.72em",
+                width: "auto",
+                flexShrink: 0,
+                marginBottom: "0.05em",
+              }}
+            />
           </a>
         </div>
 
