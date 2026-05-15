@@ -1,4 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Anton&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500&family=Noto+Sans+SC:wght@400;500&family=Noto+Sans+JP:wght@400;500&family=Noto+Sans+KR:wght@400;500&family=Noto+Sans+Arabic:wght@400;500&family=Noto+Sans+Devanagari:wght@400;500&family=Noto+Sans+Thai:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -98,12 +100,20 @@
 }
 
 /* ─────────────────────────────────────────
-   Smooth scroll
+   Google Sans — for localised greeting word
+───────────────────────────────────────── */
+.font-google-sans {
+  font-family: "Google Sans", "Noto Sans", "Noto Sans SC", "Noto Sans JP",
+               "Noto Sans KR", "Noto Sans Arabic", "Noto Sans Devanagari",
+               "Noto Sans Thai", sans-serif;
+}
+
+/* ─────────────────────────────────────────
+   Base
 ───────────────────────────────────────── */
 html {
   scroll-behavior: smooth;
   cursor: none;
-  background: #ffffff; /* white mask visible outside the clip during circle-reveal */
 }
 
 * {
@@ -111,158 +121,24 @@ html {
 }
 
 /* ─────────────────────────────────────────
-   Scrollbar — black thumb
+   Scrollbar
 ───────────────────────────────────────── */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: #111111;
-  border-radius: 0;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #000000;
-}
-
-/* Firefox */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #111111 transparent;
-}
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #111111; border-radius: 0; }
+::-webkit-scrollbar-thumb:hover { background: #000000; }
+* { scrollbar-width: thin; scrollbar-color: #111111 transparent; }
 
 /* ─────────────────────────────────────────
-   Hero — page-load animations
+   Hero mask — overflow container for GSAP clip-up
 ───────────────────────────────────────── */
-@keyframes fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-@keyframes clip-up {
-  from { transform: translateY(110%); }
-  to   { transform: translateY(0); }
-}
-
-/* ─────────────────────────────────────────
-   Intro — circle reveal (center-out)
-───────────────────────────────────────── */
-@keyframes circle-reveal {
-  from { clip-path: circle(0%   at 50% 50%); }
-  to   { clip-path: circle(150% at 50% 50%); }
-}
-
-.page-reveal {
-  /* fill:both → clipped to 0% before delay fires, stays at 150% after done */
-  animation: circle-reveal 1.4s cubic-bezier(0.65, 0, 0.35, 1) 0.2s both;
-}
-
-/* Every hero text element clips up from its own mask */
 .hero-mask {
   overflow: hidden;
   display: block;
 }
 
-.hero-nav {
-  animation: fade-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
-  /* circle = 0.2s delay + 1.4s = 1.6s total; nav fires 0.05s after */
-  animation-delay: 1.65s;
-}
-
-/* Items inside .hero-mask animate with clip-up */
-.hero-mask .hero-item {
-  display: block;
-  animation: clip-up 1s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.hero-mask:nth-of-type(1) .hero-item { animation-delay: 1.75s; }
-.hero-mask:nth-of-type(2) .hero-item { animation-delay: 1.90s; }
-.hero-mask:nth-of-type(3) .hero-item { animation-delay: 2.10s; }
-
-/* Explicit delay helpers used inline — offset by circle-reveal duration (1.6s) */
-.delay-1 { animation-delay: 1.75s; }
-.delay-2 { animation-delay: 1.90s; }
-.delay-3 { animation-delay: 2.10s; }
-.delay-4 { animation-delay: 2.30s; }
-
-/* Icon staggered fade-in — applied per-icon with an inline animationDelay */
-.icon-animate {
-  animation: fade-in 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
 /* ─────────────────────────────────────────
-   Scroll reveal — base state
-───────────────────────────────────────── */
-[data-animate] {
-  opacity: 0;
-  transform: translateY(32px);
-  transition:
-    opacity  0.85s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
-  transition-delay: var(--reveal-delay, 0s);
-}
-
-[data-animate].is-visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Clip variant — for project rows */
-[data-animate-clip] {
-  overflow: hidden;
-}
-
-/* Named class avoids inline-style specificity conflicts */
-.clip-child {
-  transform: translateY(112%);
-  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
-  transition-delay: var(--reveal-delay, 0s);
-}
-
-[data-animate-clip].is-visible .clip-child {
-  transform: translateY(0);
-}
-
-@layer components {
-  /* Nav / footer text links — 1px underline on hover */
-  .link-underline {
-    @apply relative inline-block font-dm-mono font-medium;
-    font-size: 14px;
-    letter-spacing: normal;
-  }
-  .link-underline::after {
-    content: '';
-    @apply absolute bottom-0 left-0 w-0 transition-all duration-300;
-    height: 1px;
-    background-color: currentColor;
-  }
-  .link-underline:hover::after {
-    @apply w-full;
-  }
-
-  /* Footer dark overrides */
-  .footer-dark .link-underline {
-    color: #6b7280;
-  }
-  .footer-dark .link-underline:hover {
-    color: #ffffff;
-  }
-  .footer-dark .link-underline::after {
-    background-color: #ffffff;
-  }
-
-  /* Project title rows */
-  .project-title {
-    position: relative;
-    display: block;
-    cursor: default;
-  }
-}
-
-/* ─────────────────────────────────────────
-   Mobile menu — slide-in animation
+   Mobile menu
 ───────────────────────────────────────── */
 @keyframes menu-down {
   from { opacity: 0; transform: translateY(-8px); }
@@ -294,12 +170,12 @@ html {
    Mobile — cursor restore
 ───────────────────────────────────────── */
 @media (max-width: 1023px) {
-  html, * {
-    cursor: auto !important;
-  }
+  html, * { cursor: auto !important; }
 }
 
-/* Icon hover — smooth like butter */
+/* ─────────────────────────────────────────
+   Icon hover
+───────────────────────────────────────── */
 .icon-wrap {
   transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
@@ -336,7 +212,6 @@ html {
   transform: translateX(-50%) translateY(0);
 }
 
-/* On mobile, left-align tooltips so they don't bleed off the left edge */
 @media (max-width: 767px) {
   .icon-wrap .icon-tip {
     left: 0;
@@ -345,4 +220,28 @@ html {
   .icon-wrap:hover .icon-tip {
     transform: translateY(0);
   }
+}
+
+/* ─────────────────────────────────────────
+   Nav / footer links
+───────────────────────────────────────── */
+@layer components {
+  .link-underline {
+    @apply relative inline-block font-dm-mono font-medium;
+    font-size: 14px;
+    letter-spacing: normal;
+  }
+  .link-underline::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-0 transition-all duration-300;
+    height: 1px;
+    background-color: currentColor;
+  }
+  .link-underline:hover::after {
+    @apply w-full;
+  }
+
+  .footer-dark .link-underline { color: #6b7280; }
+  .footer-dark .link-underline:hover { color: #ffffff; }
+  .footer-dark .link-underline::after { background-color: #ffffff; }
 }

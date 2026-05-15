@@ -1,34 +1,48 @@
 import { useEffect } from "react";
+import gsap from "gsap";
 
 export function useScrollReveal() {
   useEffect(() => {
-    // Strip any cached .is-visible so animations always replay on load
-    document.querySelectorAll(".is-visible").forEach((el) => {
-      el.classList.remove("is-visible");
-    });
+    const targets = Array.from(
+      document.querySelectorAll<HTMLElement>("[data-animate]")
+    );
 
-    const targets = document.querySelectorAll("[data-animate], [data-animate-clip]");
+    // Use opacity only (not autoAlpha) so visibility stays intact
+    // and IntersectionObserver can detect elements correctly
+    targets.forEach((el) => {
+      gsap.set(el, { opacity: 0, y: 52 });
+    });
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-visible");
-            observer.unobserve(entry.target);
-          }
+          if (!entry.isIntersecting) return;
+          const el = entry.target as HTMLElement;
+          const delay = parseFloat(
+            getComputedStyle(el).getPropertyValue("--reveal-delay") || "0"
+          );
+          gsap.to(el, {
+            opacity: 1,
+            y: 0,
+            duration: 0.9,
+            delay: isNaN(delay) ? 0 : delay,
+            ease: "power3.out",
+          });
+          observer.unobserve(el);
         });
       },
-      { threshold: 0.06, rootMargin: "0px 0px -32px 0px" }
+      { threshold: 0.05, rootMargin: "0px 0px -16px 0px" }
     );
 
-    // Small delay so the hero entrance plays first before scroll observer kicks in
+    // Short delay so page-entry animations finish first
     const id = setTimeout(() => {
       targets.forEach((el) => observer.observe(el));
-    }, 200);
+    }, 250);
 
     return () => {
       clearTimeout(id);
       observer.disconnect();
+      targets.forEach((el) => gsap.set(el, { clearProps: "opacity,y,transform" }));
     };
   }, []);
 }
