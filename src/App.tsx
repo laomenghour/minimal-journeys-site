@@ -13,18 +13,54 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+/**
+ * Returns { cx, cy, diameter } for a circle centred on [data-nav-profile]
+ * that is large enough to cover the entire viewport from that origin.
+ */
+export function getMaskCircle() {
+  const el = document.querySelector("[data-nav-profile]");
+  const rect = el?.getBoundingClientRect();
+  const cx = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
+  const cy = rect ? rect.top + rect.height / 2 : window.innerHeight / 2;
+
+  // Radius = distance to the farthest viewport corner
+  const radius = Math.max(
+    Math.hypot(cx, cy),
+    Math.hypot(window.innerWidth - cx, cy),
+    Math.hypot(cx, window.innerHeight - cy),
+    Math.hypot(window.innerWidth - cx, window.innerHeight - cy)
+  );
+
+  return { cx, cy, diameter: radius * 2 * 1.05 }; // 5 % safety margin
+}
+
 const App = () => {
-  const revealRef = useRef<HTMLDivElement>(null);
+  const introRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const el = revealRef.current;
-    if (!el) return;
-    // Initial circle-reveal: expand clip from 0% → 150%
-    gsap.fromTo(
-      el,
-      { clipPath: "circle(0% at 50% 50%)" },
-      { clipPath: "circle(150% at 50% 50%)", duration: 1.4, ease: "power2.out", delay: 0.15 }
-    );
+    const circle = introRef.current;
+    if (!circle) return;
+
+    const { cx, cy, diameter } = getMaskCircle();
+    const half = diameter / 2;
+
+    // Size + centre the circle on the profile avatar
+    gsap.set(circle, {
+      width: diameter,
+      height: diameter,
+      x: cx - half,
+      y: cy - half,
+      scale: 1,           // starts fully covering the screen
+    });
+
+    // Shrink to zero — GPU-composited, butter smooth
+    gsap.to(circle, {
+      scale: 0,
+      duration: 1.3,
+      ease: "power4.inOut",
+      delay: 0.1,
+      onComplete: () => { circle.style.display = "none"; },
+    });
   }, []);
 
   return (
@@ -35,16 +71,32 @@ const App = () => {
         <Sonner />
         <BrowserRouter>
           <PageTransition>
-            <div ref={revealRef} style={{ clipPath: "circle(0% at 50% 50%)" }}>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/about" element={<About />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </div>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/about" element={<About />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
           </PageTransition>
         </BrowserRouter>
+
+        {/*
+          Intro circle — covers the page on first load, then shrinks toward
+          the profile avatar via transform: scale() (GPU compositor layer).
+        */}
+        <div
+          ref={introRef}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            borderRadius: "50%",
+            background: "#3883ce",
+            zIndex: 10000,
+            pointerEvents: "none",
+            willChange: "transform",
+          }}
+        />
       </TooltipProvider>
     </QueryClientProvider>
   );

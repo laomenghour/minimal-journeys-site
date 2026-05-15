@@ -117,7 +117,7 @@ const Index = () => {
 
   // ── Hero GSAP timeline (fires after circle-reveal) ──
   useEffect(() => {
-    const CIRCLE_END = 0.15 + 1.4; // delay + duration from App.tsx
+    const CIRCLE_END = 0.1 + 1.35; // delay + duration from App.tsx
 
     // Set initial hidden states
     gsap.set(navRef.current, { autoAlpha: 0 });
@@ -226,7 +226,7 @@ const Index = () => {
               gsap.to(helloRef.current, { opacity: 0, x: -8, scale: 0.88, duration: 0.22, ease: "power2.in" });
             }}
           >
-            <img src={profileImg} alt="Menghour" className="w-10 h-10 md:w-12 md:h-12" style={{ borderRadius: 0 }} />
+            <img src={profileImg} alt="Menghour" data-nav-profile className="w-10 h-10 md:w-12 md:h-12" style={{ borderRadius: 0 }} />
             <img
               ref={helloRef}
               src={helloSvg}

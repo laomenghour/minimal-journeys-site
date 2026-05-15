@@ -1,6 +1,7 @@
 import { createContext, useContext, useRef, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import gsap from "gsap";
+import { getMaskCircle } from "@/App";
 
 type NavigateFn = (path: string) => void;
 
@@ -12,44 +13,66 @@ export function usePageTransition(): NavigateFn {
 
 export function PageTransition({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
-  const overlayRef = useRef<HTMLDivElement>(null);
+  const circleRef = useRef<HTMLDivElement>(null);
 
   const navigateTo: NavigateFn = (path) => {
-    const overlay = overlayRef.current;
-    if (!overlay) { navigate(path); return; }
+    const circle = circleRef.current;
+    if (!circle) { navigate(path); return; }
+
+    // Measure live position of the avatar at the moment of the click
+    const { cx, cy, diameter } = getMaskCircle();
+    const half = diameter / 2;
 
     gsap.timeline()
-      .set(overlay, { display: "block", clipPath: "circle(0% at 50% 50%)" })
-      .to(overlay, {
-        clipPath: "circle(150% at 50% 50%)",
-        duration: 0.6,
-        ease: "power2.in",
+      // Pinpoint at the avatar, hidden
+      .set(circle, {
+        display: "block",
+        width: diameter,
+        height: diameter,
+        x: cx - half,
+        y: cy - half,
+        scale: 0,
       })
+      // Expand to cover the whole screen — GPU scale, butter smooth
+      .to(circle, {
+        scale: 1,
+        duration: 0.55,
+        ease: "power4.inOut",
+      })
+      // Swap the route while the circle covers everything
       .add(() => {
         navigate(path);
         window.scrollTo(0, 0);
       })
-      .to(overlay, {
-        clipPath: "circle(0% at 50% 50%)",
-        duration: 0.7,
-        ease: "power2.out",
-        delay: 0.08,
+      // Contract back toward the avatar, revealing the new page
+      .to(circle, {
+        scale: 0,
+        duration: 0.65,
+        ease: "power4.inOut",
+        delay: 0.05,
       })
-      .set(overlay, { display: "none" });
+      .set(circle, { display: "none" });
   };
 
   return (
     <TransitionContext.Provider value={navigateTo}>
       {children}
+      {/*
+        Circle uses transform: scale() — GPU compositor, zero repaint.
+        Sized and positioned dynamically at navigate time.
+      */}
       <div
-        ref={overlayRef}
+        ref={circleRef}
         style={{
           position: "fixed",
-          inset: 0,
-          background: "#111111",
+          top: 0,
+          left: 0,
+          borderRadius: "50%",
+          background: "#3883ce",
           zIndex: 9999,
           display: "none",
           pointerEvents: "none",
+          willChange: "transform",
         }}
       />
     </TransitionContext.Provider>

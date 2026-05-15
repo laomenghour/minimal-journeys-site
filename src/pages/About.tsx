@@ -217,6 +217,7 @@ const About = () => {
             <img
               src={profileImg}
               alt="Menghour"
+              data-nav-profile
               className="w-10 h-10 md:w-12 md:h-12"
               style={{ borderRadius: 0, cursor: "pointer" }}
               onClick={() => navigateTo("/")}
