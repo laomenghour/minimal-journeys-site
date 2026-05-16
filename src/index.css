@@ -124,10 +124,10 @@ html {
    Scrollbar
 ───────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #111111; border-radius: 0; }
-::-webkit-scrollbar-thumb:hover { background: #000000; }
-* { scrollbar-width: thin; scrollbar-color: #111111 transparent; }
+::-webkit-scrollbar-track { background: #111111; }
+::-webkit-scrollbar-thumb { background: #444444; border-radius: 0; }
+::-webkit-scrollbar-thumb:hover { background: #666666; }
+* { scrollbar-width: thin; scrollbar-color: #444444 #111111; }
 
 /* ─────────────────────────────────────────
    Hero mask — overflow container for GSAP clip-up
@@ -177,14 +177,11 @@ html {
    Icon hover
 ───────────────────────────────────────── */
 .icon-wrap {
-  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.icon-wrap:hover {
-  transform: scale(1.08) translateY(-4px);
+  will-change: transform;
 }
 .icon-wrap .icon-outline,
 .icon-wrap .icon-color {
-  transition: opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1) !important;
+  transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1) !important;
 }
 .icon-wrap:hover .icon-outline { opacity: 0 !important; }
 .icon-wrap:hover .icon-color   { opacity: 1 !important; }
@@ -204,8 +201,8 @@ html {
   padding: 6px 12px;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1),
-              transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  transition: opacity 0.45s cubic-bezier(0.25, 1, 0.5, 1),
+              transform 0.55s cubic-bezier(0.34, 1.7, 0.64, 1);
 }
 .icon-wrap:hover .icon-tip {
   opacity: 1;

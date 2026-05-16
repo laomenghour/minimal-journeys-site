@@ -1,7 +1,7 @@
 import { createContext, useContext, useRef, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import gsap from "gsap";
-import { getMaskCircle } from "@/App";
+import { getMaskCircle, randomMaskColor } from "@/App";
 
 type NavigateFn = (path: string) => void;
 
@@ -27,6 +27,7 @@ export function PageTransition({ children }: { children: ReactNode }) {
       // Pinpoint at the avatar, hidden
       .set(circle, {
         display: "block",
+        background: randomMaskColor(),
         width: diameter,
         height: diameter,
         x: cx - half,
@@ -36,20 +37,20 @@ export function PageTransition({ children }: { children: ReactNode }) {
       // Expand to cover the whole screen — GPU scale, butter smooth
       .to(circle, {
         scale: 1,
-        duration: 0.55,
+        duration: 0.42,
         ease: "power4.inOut",
       })
       // Swap the route while the circle covers everything
       .add(() => {
-        navigate(path);
+        navigate(path, { state: { fromTransition: true } });
         window.scrollTo(0, 0);
       })
       // Contract back toward the avatar, revealing the new page
       .to(circle, {
         scale: 0,
-        duration: 0.65,
+        duration: 0.52,
         ease: "power4.inOut",
-        delay: 0.05,
+        delay: 0.04,
       })
       .set(circle, { display: "none" });
   };
@@ -68,7 +69,7 @@ export function PageTransition({ children }: { children: ReactNode }) {
           top: 0,
           left: 0,
           borderRadius: "50%",
-          background: "#3883ce",
+          background: "transparent",
           zIndex: 9999,
           display: "none",
           pointerEvents: "none",

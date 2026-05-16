@@ -16,19 +16,23 @@ export function useScrollReveal() {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
           const el = entry.target as HTMLElement;
           const delay = parseFloat(
             getComputedStyle(el).getPropertyValue("--reveal-delay") || "0"
           );
-          gsap.to(el, {
-            opacity: 1,
-            y: 0,
-            duration: 0.9,
-            delay: isNaN(delay) ? 0 : delay,
-            ease: "power3.out",
-          });
-          observer.unobserve(el);
+          if (entry.isIntersecting) {
+            gsap.killTweensOf(el);
+            gsap.to(el, {
+              opacity: 1,
+              y: 0,
+              duration: 0.9,
+              delay: isNaN(delay) ? 0 : delay,
+              ease: "power3.out",
+            });
+          } else {
+            gsap.killTweensOf(el);
+            gsap.set(el, { opacity: 0, y: 52 });
+          }
         });
       },
       { threshold: 0.05, rootMargin: "0px 0px -16px 0px" }

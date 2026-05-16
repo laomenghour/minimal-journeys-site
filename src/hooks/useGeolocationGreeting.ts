@@ -110,15 +110,20 @@ export function useGeolocationGreeting(): GeolocationGreeting {
       signal: controller.signal,
       headers: { Accept: "application/json" },
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error("geo fetch failed");
+        return res.json();
+      })
       .then((data) => {
-        const code = (data.country_code ?? "") as string;
+        if (typeof data !== "object" || data === null) throw new Error("invalid response");
+        const code = typeof data.country_code === "string"
+          ? data.country_code.replace(/[^A-Z]/g, "").slice(0, 2)
+          : "";
+        const country = typeof data.country_name === "string"
+          ? data.country_name.replace(/[<>"'&]/g, "").slice(0, 60)
+          : "";
         const info = greetings[code] ?? DEFAULT;
-        setState({
-          ...info,
-          country: data.country_name ?? "",
-          loading: false,
-        });
+        setState({ ...info, country, loading: false });
       })
       .catch(() => {
         if (!controller.signal.aborted) {

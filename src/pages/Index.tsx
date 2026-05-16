@@ -1,9 +1,14 @@
 import { useRef, useEffect, useState } from "react";
 import gsap from "gsap";
+import { useLocation } from "react-router-dom";
 import { usePageTransition } from "@/components/PageTransition";
 import ExternalLink from "@/components/ExternalLink";
 import profileImg from "@/assets/mh_profile.png";
 import helloSvg from "@/assets/hello.svg";
+import photo1 from "@/assets/DSC03998.jpg";
+import photo2 from "@/assets/DSC04190.jpg";
+import photo3 from "@/assets/DSC04206.jpg";
+import photo4 from "@/assets/DSC042061.jpg";
 import coffeeDesign from "@/assets/coffee-design.svg";
 import coffeeWriting from "@/assets/coffee-writing.svg";
 import photographyIcon from "@/assets/photography.svg";
@@ -35,6 +40,13 @@ const services = [
   "Vibe Coding",
   "Motion Graphics",
   "Product Psychology",
+];
+
+const photoItems = [
+  { src: photo1, caption: "Life on the streets",  captionBg: "#ea5959", rotate: -5,  mt: 0  },
+  { src: photo2, caption: "Between the light",    captionBg: "#f5be47", rotate: 3.5, mt: 36 },
+  { src: photo3, caption: "Phnom Penh mornings",  captionBg: "#ffffff", rotate: -2,  mt: 8  },
+  { src: photo4, caption: "Quiet moments",        captionBg: "#111111", rotate: 6,   mt: 24 },
 ];
 
 const iconItems = [
@@ -98,15 +110,16 @@ function NavLinkButton({ label, onClick, style: extraStyle }: { label: string; o
 }
 
 const Index = () => {
-  const designRef    = useRef<HTMLElement>(null);
-  const projectsRef  = useRef<HTMLDivElement>(null);
-  const footerRef    = useRef<HTMLElement>(null);
-  const helloRef     = useRef<HTMLImageElement>(null);
-  const navRef       = useRef<HTMLElement>(null);
-  const eyebrowRef   = useRef<HTMLParagraphElement>(null);
-  const headlineRef  = useRef<HTMLHeadingElement>(null);
-  const subtextRef   = useRef<HTMLParagraphElement>(null);
-  const heroSectionRef = useRef<HTMLDivElement>(null); // wraps the whole hero to query all icons
+  const designRef      = useRef<HTMLElement>(null);
+  const projectsRef    = useRef<HTMLDivElement>(null);
+  const footerRef      = useRef<HTMLElement>(null);
+  const helloRef       = useRef<HTMLImageElement>(null);
+  const navRef         = useRef<HTMLElement>(null);
+  const eyebrowRef     = useRef<HTMLParagraphElement>(null);
+  const headlineRef    = useRef<HTMLHeadingElement>(null);
+  const subtextRef     = useRef<HTMLParagraphElement>(null);
+  const heroSectionRef = useRef<HTMLDivElement>(null);
+  const photoPathRef   = useRef<SVGPathElement>(null);
 
   const [inView, setInView]                   = useState(false);
   const [projectsVisible, setProjectsVisible] = useState(false);
@@ -114,10 +127,14 @@ const Index = () => {
   const [menuOpen, setMenuOpen]               = useState(false);
   const geo = useGeolocationGreeting();
   const navigateTo = usePageTransition();
+  const location = useLocation();
 
   // ── Hero GSAP timeline (fires after circle-reveal) ──
   useEffect(() => {
-    const CIRCLE_END = 0.1 + 1.35; // delay + duration from App.tsx
+    // Page transition: expand 0.42s → mount → contract 0.56s → done 0.56s after mount
+    // First load: intro circle delay 0.05s + duration 0.85s = 0.9s after mount
+    const fromTransition = (location.state as { fromTransition?: boolean } | null)?.fromTransition === true;
+    const CIRCLE_END = fromTransition ? 0.58 : 0.92;
 
     // Set initial hidden states
     gsap.set(navRef.current, { autoAlpha: 0 });
@@ -167,18 +184,64 @@ const Index = () => {
     return () => obs.disconnect();
   }, []);
 
-  // Project list reveal
+  // Photography path draw-on scroll — repeats every time section enters view
+  useEffect(() => {
+    const path = photoPathRef.current;
+    if (!path) return;
+    const length = 1277.72;
+    gsap.set(path, { strokeDasharray: length, strokeDashoffset: length });
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          gsap.to(path, { strokeDashoffset: 0, duration: 1.6, ease: "power2.out", delay: 0.2 });
+        } else {
+          gsap.killTweensOf(path);
+          gsap.set(path, { strokeDashoffset: length });
+        }
+      },
+      { threshold: 0.3 }
+    );
+    obs.observe(path);
+    return () => obs.disconnect();
+  }, []);
+
+  // Project list reveal — repeats every scroll
   useEffect(() => {
     const el = projectsRef.current;
     if (!el) return;
     const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) { setProjectsVisible(true); obs.disconnect(); }
-      },
+      ([entry]) => setProjectsVisible(entry.isIntersecting),
       { threshold: 0.08 }
     );
     obs.observe(el);
     return () => obs.disconnect();
+  }, []);
+
+  // Icon hover — butter smooth elastic bounce via GSAP
+  useEffect(() => {
+    const wraps = Array.from(document.querySelectorAll<HTMLElement>(".icon-wrap"));
+
+    const onEnter = (e: Event) => {
+      const el = e.currentTarget as HTMLElement;
+      gsap.killTweensOf(el);
+      gsap.to(el, { scale: 1.18, y: -10, duration: 0.7, ease: "elastic.out(1, 0.5)" });
+    };
+    const onLeave = (e: Event) => {
+      const el = e.currentTarget as HTMLElement;
+      gsap.killTweensOf(el);
+      gsap.to(el, { scale: 1, y: 0, duration: 0.55, ease: "back.inOut(2)" });
+    };
+
+    wraps.forEach((el) => {
+      el.addEventListener("mouseenter", onEnter);
+      el.addEventListener("mouseleave", onLeave);
+    });
+    return () => {
+      wraps.forEach((el) => {
+        el.removeEventListener("mouseenter", onEnter);
+        el.removeEventListener("mouseleave", onLeave);
+      });
+    };
   }, []);
 
   // Close mobile menu on resize
@@ -385,8 +448,8 @@ const Index = () => {
           backgroundColor: inView ? "#ffffff" : "#111111",
           color: inView ? "#000000" : "#ffffff",
           transition: "background-color 0.8s ease, color 0.8s ease",
-          paddingTop: 48,
-          paddingBottom: 48,
+          paddingTop: 96,
+          paddingBottom: 96,
         }}
       >
         <p
@@ -449,12 +512,109 @@ const Index = () => {
         </div>
       </section>
 
+      {/* ── Photography — Blue ── */}
+      <section style={{ background: "#3883ce", paddingTop: 96, paddingBottom: 96, position: "relative" }}>
+        <div
+          className="flex flex-col md:flex-row items-center px-6 md:px-14 lg:px-[104px]"
+          style={{ gap: "clamp(40px, 6vw, 80px)", position: "relative" }}
+        >
+          {/* Left: copy */}
+          <div style={{ flexShrink: 0, maxWidth: 300, position: "relative", paddingTop: 120 }}>
+            <img
+              src={photographyColor}
+              alt=""
+              aria-hidden
+              style={{
+                position: "absolute",
+                top: -140,
+                left: -32,
+                width: 220,
+                opacity: 1,
+                transform: "rotate(-12deg)",
+                pointerEvents: "none",
+                userSelect: "none",
+                zIndex: 0,
+              }}
+            />
+            <div data-animate style={{ display: "inline-block", position: "relative", zIndex: 1, marginBottom: 16 }}>
+              <p className="font-dm-mono" style={{ fontSize: 15, fontWeight: 500, color: "rgba(0,0,0,0.5)" }}>
+                Photography
+              </p>
+              <svg xmlns="http://www.w3.org/2000/svg" width="180" height="42" viewBox="0 0 608 100" fill="none" style={{ display: "block", marginTop: -34, marginLeft: -30, color: "#111111" }}>
+                <path
+                  ref={photoPathRef}
+                  d="M322.902 98.9997C232.515 99.0422 140.637 94.7899 58.0275 80.853C31.532 76.3775 2.92086 69.1167 1.08733 58.1139C-0.222339 50.1514 13.3981 42.965 28.5701 37.4583C61.2714 25.5944 103.362 18.1423 146.239 12.7206C228.606 2.3131 316.878 -1.23755 403.155 2.36627C456.307 4.58809 509.519 9.62707 555.338 20.109C581.41 26.0728 606.777 35.279 606.999 46.8453C607.12 53.7659 597.831 60.3569 584.835 65.1939C571.839 70.0309 555.398 73.3158 538.675 76.0266C463.097 88.252 379.057 89.8891 297.011 91.3668"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+            <h2
+              data-animate
+              className="font-anton"
+              style={{ fontSize: "clamp(42px, 5.5vw, 82px)", lineHeight: 0.93, letterSpacing: "-0.04em", color: "#111111", marginBottom: 20, position: "relative", zIndex: 1, "--reveal-delay": "0.08s" } as React.CSSProperties}
+            >
+              Streets of Phnom Penh
+            </h2>
+            <p
+              data-animate
+              className="font-dm-mono"
+              style={{ fontSize: 14, color: "rgba(0,0,0,0.6)", lineHeight: 1.7, maxWidth: 260, marginBottom: 28, "--reveal-delay": "0.16s" } as React.CSSProperties}
+            >
+              Documenting life and quiet moments on the streets of Cambodia.
+            </p>
+            <a
+              data-animate
+              href="https://www.instagram.com/photo.bymenghour/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-dm-mono"
+              style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, color: "#111111", borderBottom: "1px solid rgba(0,0,0,0.3)", paddingBottom: 2, textDecoration: "none", "--reveal-delay": "0.22s" } as React.CSSProperties}
+            >
+              View on Instagram ↗
+            </a>
+          </div>
+
+          {/* Right: scattered photos */}
+          <div className="flex items-start justify-center flex-wrap md:flex-nowrap" style={{ flex: 1, gap: 0 }}>
+            {photoItems.map(({ src, rotate, mt }, i) => (
+              <div
+                key={i}
+                style={{ position: "relative", flexShrink: 0, transform: `rotate(${rotate}deg)`, marginTop: mt, marginRight: -18, cursor: "pointer" }}
+                onMouseEnter={(e) => {
+                  const wrapper = e.currentTarget;
+                  const img = wrapper.querySelector("img") as HTMLImageElement;
+                  gsap.killTweensOf([wrapper, img]);
+                  gsap.to(wrapper, { rotate: 0, scale: 1.45, y: -22, zIndex: 20, duration: 0.7, ease: "elastic.out(1, 0.5)" });
+                  gsap.to(img, { boxShadow: "0 32px 80px rgba(0,0,0,0.45)", duration: 0.4, ease: "power2.out" });
+                }}
+                onMouseLeave={(e) => {
+                  const wrapper = e.currentTarget;
+                  const img = wrapper.querySelector("img") as HTMLImageElement;
+                  gsap.killTweensOf([wrapper, img]);
+                  gsap.to(wrapper, { rotate, scale: 1, y: 0, zIndex: 1, duration: 0.55, ease: "back.inOut(1.8)" });
+                  gsap.to(img, { boxShadow: "0 12px 40px rgba(0,0,0,0.28)", duration: 0.4, ease: "power2.inOut" });
+                }}
+              >
+                <img
+                  src={src}
+                  alt="Street photography"
+                  style={{ width: "clamp(200px, 26vw, 340px)", aspectRatio: "4/3", objectFit: "cover", borderRadius: 8, boxShadow: "0 12px 40px rgba(0,0,0,0.28)", display: "block" }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── Footer ── */}
       <footer ref={footerRef} className="footer-dark" style={{ background: "#111111" }}>
 
         <div
           className="grid grid-cols-1 md:grid-cols-3 px-6 md:px-14 lg:px-[104px]"
-          style={{ paddingTop: 48, paddingBottom: 48, gap: 40 }}
+          style={{ paddingTop: 80, paddingBottom: 80, gap: 40 }}
         >
           {/* Skills */}
           <div data-animate style={{ "--reveal-delay": "0s" } as React.CSSProperties}>

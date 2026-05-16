@@ -13,6 +13,11 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+const MASK_COLORS = ["#ea5959", "#3883ce", "#f5be47"];
+export function randomMaskColor() {
+  return MASK_COLORS[Math.floor(Math.random() * MASK_COLORS.length)];
+}
+
 /**
  * Returns { cx, cy, diameter } for a circle centred on [data-nav-profile]
  * that is large enough to cover the entire viewport from that origin.
@@ -56,9 +61,9 @@ const App = () => {
     // Shrink to zero — GPU-composited, butter smooth
     gsap.to(circle, {
       scale: 0,
-      duration: 1.3,
+      duration: 0.85,
       ease: "power4.inOut",
-      delay: 0.1,
+      delay: 0.05,
       onComplete: () => { circle.style.display = "none"; },
     });
   }, []);
@@ -91,7 +96,7 @@ const App = () => {
             top: 0,
             left: 0,
             borderRadius: "50%",
-            background: "#3883ce",
+            background: randomMaskColor(),
             zIndex: 10000,
             pointerEvents: "none",
             willChange: "transform",
