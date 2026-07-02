@@ -42,6 +42,12 @@ const services = [
   "Product Psychology",
 ];
 
+const heroTexts = [
+  { lines: ["Hello, I'm Menghour."], holdMs: 2000 },
+  { lines: ["Welcome to", "my portfolio."], holdMs: 2000 },
+  { lines: ["7+ Years of Turning", "Ideas into Startup", "Products."], holdMs: 3000 },
+];
+
 const photoItems = [
   { src: photo1, caption: "Life on the streets",  captionBg: "#ea5959", rotate: -5,  mt: 0  },
   { src: photo2, caption: "Between the light",    captionBg: "#f5be47", rotate: 3.5, mt: 36 },
@@ -125,6 +131,7 @@ const Index = () => {
   const [projectsVisible, setProjectsVisible] = useState(false);
   const [hovered, setHovered]                 = useState<string | null>(null);
   const [menuOpen, setMenuOpen]               = useState(false);
+  const [heroTextIndex, setHeroTextIndex]     = useState(0);
   const geo = useGeolocationGreeting();
   const navigateTo = usePageTransition();
   const location = useLocation();
@@ -138,7 +145,7 @@ const Index = () => {
 
     // Set initial hidden states
     gsap.set(navRef.current, { autoAlpha: 0 });
-    gsap.set([eyebrowRef.current, headlineRef.current, subtextRef.current], {
+    gsap.set([eyebrowRef.current, subtextRef.current], {
       y: "110%",
       clipPath: "inset(0 0 100% 0)",
     });
@@ -155,9 +162,6 @@ const Index = () => {
     tl.to(eyebrowRef.current, {
       y: "0%", clipPath: "inset(0 0 0% 0)", duration: 0.9, ease: "power3.out",
     }, 0.05);
-    tl.to(headlineRef.current, {
-      y: "0%", clipPath: "inset(0 0 0% 0)", duration: 1.0, ease: "power3.out",
-    }, 0.18);
     tl.to(subtextRef.current, {
       y: "0%", clipPath: "inset(0 0 0% 0)", duration: 0.9, ease: "power3.out",
     }, 0.36);
@@ -170,7 +174,49 @@ const Index = () => {
     tl.to(allIcons, {
       opacity: 1, duration: 0.65, stagger: 0.12, ease: "power2.out",
     }, 0.5);
+
+    return () => {
+      tl.kill();
+    };
   }, []);
+
+  // ── Headline text cycle — each line fades in row by row, holds, then swaps ──
+  useEffect(() => {
+    const container = headlineRef.current;
+    if (!container) return;
+    const lines = container.querySelectorAll<HTMLElement>(".hero-line");
+    if (!lines.length) return;
+
+    const fromTransition = (location.state as { fromTransition?: boolean } | null)?.fromTransition === true;
+    const CIRCLE_END = fromTransition ? 0.58 : 0.92;
+    const startDelay = heroTextIndex === 0 ? CIRCLE_END + 0.18 : 0;
+
+    gsap.set(lines, { opacity: 0, y: 14 });
+    const fadeIn = gsap.to(lines, {
+      opacity: 1, y: 0, duration: 0.55, stagger: 0.12, ease: "power2.out", delay: startDelay,
+    });
+
+    const isLast = heroTextIndex === heroTexts.length - 1;
+    let fadeOut: gsap.core.Tween | undefined;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+    if (!isLast) {
+      const holdMs = heroTexts[heroTextIndex].holdMs;
+      const totalDelayMs = (startDelay + fadeIn.duration()) * 1000;
+      timeoutId = setTimeout(() => {
+        fadeOut = gsap.to(lines, {
+          opacity: 0, y: -14, duration: 0.35, stagger: 0.08, ease: "power2.inOut",
+          onComplete: () => setHeroTextIndex((i) => i + 1),
+        });
+      }, totalDelayMs + holdMs);
+    }
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      fadeIn.kill();
+      fadeOut?.kill();
+    };
+  }, [heroTextIndex, location.state]);
 
   // Background colour transition (black → white)
   useEffect(() => {
@@ -395,15 +441,15 @@ const Index = () => {
           </div>
 
           {/* Headline */}
-          <div className="hero-mask">
-            <h1
-              ref={headlineRef}
-              className="font-anton"
-              style={{ fontSize: "clamp(54px, 10.5vw, 180px)", lineHeight: 0.95, letterSpacing: "-0.04em", color: "#ffffff" }}
-            >
-              7 Years of Turning Ideas into Startup Products
-            </h1>
-          </div>
+          <h1
+            ref={headlineRef}
+            className="font-anton"
+            style={{ fontSize: "clamp(54px, 10.5vw, 180px)", lineHeight: 1.05, letterSpacing: "-0.04em", color: "#ffffff" }}
+          >
+            {heroTexts[heroTextIndex].lines.map((line, i) => (
+              <div key={i} className="hero-line">{line}</div>
+            ))}
+          </h1>
 
           {/* Subtext */}
           <div className="hero-mask" style={{ marginTop: 18 }}>
@@ -516,7 +562,7 @@ const Index = () => {
       <section style={{ background: "#3883ce", paddingTop: 96, paddingBottom: 96, position: "relative" }}>
         <div
           className="flex flex-col md:flex-row items-center px-6 md:px-14 lg:px-[104px]"
-          style={{ gap: "clamp(40px, 6vw, 80px)", position: "relative" }}
+          style={{ gap: "clamp(24px, 3.5vw, 56px)", position: "relative" }}
         >
           {/* Left: copy */}
           <div style={{ flexShrink: 0, maxWidth: 300, position: "relative", paddingTop: 120 }}>
@@ -578,11 +624,11 @@ const Index = () => {
           </div>
 
           {/* Right: scattered photos */}
-          <div className="flex items-start justify-center flex-wrap md:flex-nowrap" style={{ flex: 1, gap: 0 }}>
+          <div className="flex items-start justify-center flex-wrap md:flex-nowrap" style={{ flex: 1, gap: 0, minWidth: 0 }}>
             {photoItems.map(({ src, rotate, mt }, i) => (
               <div
                 key={i}
-                style={{ position: "relative", flexShrink: 0, transform: `rotate(${rotate}deg)`, marginTop: mt, marginRight: -18, cursor: "pointer" }}
+                style={{ position: "relative", flex: "1 1 200px", minWidth: 0, maxWidth: 420, transform: `rotate(${rotate}deg)`, marginTop: mt, marginRight: -30, cursor: "pointer" }}
                 onMouseEnter={(e) => {
                   const wrapper = e.currentTarget;
                   const img = wrapper.querySelector("img") as HTMLImageElement;
@@ -601,7 +647,7 @@ const Index = () => {
                 <img
                   src={src}
                   alt="Street photography"
-                  style={{ width: "clamp(200px, 26vw, 340px)", aspectRatio: "4/3", objectFit: "cover", borderRadius: 8, boxShadow: "0 12px 40px rgba(0,0,0,0.28)", display: "block" }}
+                  style={{ width: "100%", aspectRatio: "4/3", objectFit: "cover", borderRadius: 8, boxShadow: "0 12px 40px rgba(0,0,0,0.28)", display: "block" }}
                 />
               </div>
             ))}
@@ -640,6 +686,8 @@ const Index = () => {
               <li><ExternalLink href="https://www.linkedin.com/in/menghour-lao/">LinkedIn</ExternalLink></li>
               <li><ExternalLink href="https://medium.com/@menghour_lao">Medium</ExternalLink></li>
               <li><ExternalLink href="https://www.behance.net/laomenghou8e62">Behance</ExternalLink></li>
+              <li><ExternalLink href="https://lottiefiles.com/menghourlao">Animation</ExternalLink></li>
+              <li><ExternalLink href="https://vimeo.com/user241807376">Motion Design</ExternalLink></li>
             </ul>
           </div>
 
