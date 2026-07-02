@@ -34,9 +34,9 @@ const services = [
 ];
 
 function NavLinkButton({
-  label, onClick, active, style: extraStyle,
+  label, href, onClick, active, style: extraStyle,
 }: {
-  label: string; onClick: () => void; active?: boolean; style?: React.CSSProperties;
+  label: string; href?: string; onClick: () => void; active?: boolean; style?: React.CSSProperties;
 }) {
   const path1Ref = useRef<SVGPathElement>(null);
   const svgRef   = useRef<SVGSVGElement>(null);
@@ -69,17 +69,56 @@ function NavLinkButton({
     gsap.to(svgRef.current, { opacity: 0, duration: 0.1, delay: 0.3 });
   };
 
+  const sharedStyle: React.CSSProperties = {
+    background: "none", border: "none", color: "#ffffff", fontSize: 14,
+    fontWeight: 500, cursor: "pointer", padding: 0, letterSpacing: "normal",
+    position: "relative", lineHeight: 1, textDecoration: "none", ...extraStyle,
+  };
+
+  const indicator = (
+    <svg
+      ref={svgRef}
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 159 17"
+      fill="none"
+      style={{
+        position: "absolute", left: "50%", top: "calc(100% + 2px)",
+        transform: "translateX(-50%)", width: "120%", color: "#ffffff",
+        pointerEvents: "none", opacity: 0,
+      }}
+    >
+      <path
+        ref={path1Ref}
+        d="M1 12.1515C53.0771 5.7187 105.529 2.30552 158 1.93652"
+        stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+        strokeLinejoin="round" strokeDasharray="157.42 157.42" strokeDashoffset="157.42"
+      />
+    </svg>
+  );
+
+  if (href) {
+    return (
+      <a
+        href={href}
+        onClick={(e) => { e.preventDefault(); onClick(); }}
+        onMouseEnter={handleEnter}
+        onMouseLeave={handleLeave}
+        className="font-dm-mono"
+        style={sharedStyle}
+      >
+        {label}
+        {indicator}
+      </a>
+    );
+  }
+
   return (
     <button
       onClick={onClick}
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
       className="font-dm-mono"
-      style={{
-        background: "none", border: "none", color: "#ffffff", fontSize: 14,
-        fontWeight: 500, cursor: "pointer", padding: 0, letterSpacing: "normal",
-        position: "relative", lineHeight: 1, ...extraStyle,
-      }}
+      style={sharedStyle}
     >
       {label}
       <svg
@@ -186,8 +225,8 @@ const About = () => {
   useLenis();
 
   const navItems = [
-    { label: "Work",     active: false, onClick: () => navigateTo("/") },
-    { label: "About Me", active: true,  onClick: () => {} },
+    { label: "Work",     href: "/",  active: false, onClick: () => navigateTo("/") },
+    { label: "About Me", href: undefined as string | undefined, active: true, onClick: () => {} },
   ];
 
   return (
@@ -214,14 +253,15 @@ const About = () => {
               gsap.to(helloRef.current, { opacity: 0, x: -8, scale: 0.88, duration: 0.22, ease: "power2.in" });
             }}
           >
-            <img
-              src={profileImg}
-              alt="Menghour"
-              data-nav-profile
-              className="w-10 h-10 md:w-12 md:h-12"
-              style={{ borderRadius: 0, cursor: "pointer" }}
-              onClick={() => navigateTo("/")}
-            />
+            <a href="/" aria-label="Home" onClick={(e) => { e.preventDefault(); navigateTo("/"); }}>
+              <img
+                src={profileImg}
+                alt="Menghour"
+                data-nav-profile
+                className="w-10 h-10 md:w-12 md:h-12"
+                style={{ borderRadius: 0, cursor: "pointer", display: "block" }}
+              />
+            </a>
             <img
               ref={helloRef}
               src={helloSvg}
@@ -247,8 +287,8 @@ const About = () => {
 
           {/* Desktop centre — nav links */}
           <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center" style={{ gap: 28 }}>
-            {navItems.map(({ label, onClick, active }) => (
-              <NavLinkButton key={label} label={label} onClick={onClick} active={active} />
+            {navItems.map(({ label, href, onClick, active }) => (
+              <NavLinkButton key={label} label={label} href={href} onClick={onClick} active={active} />
             ))}
           </div>
 
@@ -292,10 +332,11 @@ const About = () => {
           className={`md:hidden ${menuOpen ? "mobile-menu-enter" : ""}`}
           style={{ display: menuOpen ? "flex" : "none", flexDirection: "column", borderTop: "1px solid #1a1a1a", marginBottom: 8 }}
         >
-          {navItems.map(({ label, onClick, active }) => (
+          {navItems.map(({ label, href, onClick, active }) => (
             <NavLinkButton
               key={label}
               label={label}
+              href={href}
               onClick={() => { setMenuOpen(false); onClick(); }}
               active={active}
               style={{ borderBottom: "1px solid #1a1a1a", fontSize: 15, padding: "14px 0", textAlign: "left", width: "100%" }}

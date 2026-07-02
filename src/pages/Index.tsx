@@ -61,7 +61,7 @@ const iconItems = [
   { outline: coffeeWriting,   color: coffeeColor,      label: "Writing",     size: 96,  mobileSize: 68, offset: 10,  mobileOffset: 8,  tip: "Coffee Before Everything",  tipColor: "#f5be47" },
 ];
 
-function NavLinkButton({ label, onClick, style: extraStyle }: { label: string; onClick: () => void; style?: React.CSSProperties }) {
+function NavLinkButton({ label, href, onClick, style: extraStyle }: { label: string; href?: string; onClick: () => void; style?: React.CSSProperties }) {
   const path1Ref = useRef<SVGPathElement>(null);
   const svgRef   = useRef<SVGSVGElement>(null);
 
@@ -80,37 +80,59 @@ function NavLinkButton({ label, onClick, style: extraStyle }: { label: string; o
     gsap.to(svgRef.current, { opacity: 0, duration: 0.1, delay: 0.3 });
   };
 
+  const sharedStyle: React.CSSProperties = {
+    background: "none", border: "none", color: "#ffffff", fontSize: 14,
+    fontWeight: 500, cursor: "pointer", padding: 0, letterSpacing: "normal",
+    position: "relative", lineHeight: 1, textDecoration: "none", ...extraStyle,
+  };
+
+  const indicator = (
+    <svg
+      ref={svgRef}
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 159 17"
+      fill="none"
+      style={{
+        position: "absolute", left: "50%", top: "calc(100% + 2px)",
+        transform: "translateX(-50%)", width: "120%", color: "#ffffff",
+        pointerEvents: "none", opacity: 0,
+      }}
+    >
+      <path
+        ref={path1Ref}
+        d="M1 12.1515C53.0771 5.7187 105.529 2.30552 158 1.93652"
+        stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+        strokeLinejoin="round" strokeDasharray="157.42 157.42" strokeDashoffset="157.42"
+      />
+    </svg>
+  );
+
+  if (href) {
+    return (
+      <a
+        href={href}
+        onClick={(e) => { e.preventDefault(); onClick(); }}
+        onMouseEnter={handleEnter}
+        onMouseLeave={handleLeave}
+        className="font-dm-mono"
+        style={sharedStyle}
+      >
+        {label}
+        {indicator}
+      </a>
+    );
+  }
+
   return (
     <button
       onClick={onClick}
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
       className="font-dm-mono"
-      style={{
-        background: "none", border: "none", color: "#ffffff", fontSize: 14,
-        fontWeight: 500, cursor: "pointer", padding: 0, letterSpacing: "normal",
-        position: "relative", lineHeight: 1, ...extraStyle,
-      }}
+      style={sharedStyle}
     >
       {label}
-      <svg
-        ref={svgRef}
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 159 17"
-        fill="none"
-        style={{
-          position: "absolute", left: "50%", top: "calc(100% + 2px)",
-          transform: "translateX(-50%)", width: "120%", color: "#ffffff",
-          pointerEvents: "none", opacity: 0,
-        }}
-      >
-        <path
-          ref={path1Ref}
-          d="M1 12.1515C53.0771 5.7187 105.529 2.30552 158 1.93652"
-          stroke="currentColor" strokeWidth="2" strokeLinecap="round"
-          strokeLinejoin="round" strokeDasharray="157.42 157.42" strokeDashoffset="157.42"
-        />
-      </svg>
+      {indicator}
     </button>
   );
 }
@@ -365,6 +387,7 @@ const Index = () => {
               <NavLinkButton
                 key={label}
                 label={label}
+                href={path}
                 onClick={() => {
                   if (path) { navigateTo(path); return; }
                   const top = (ref?.current?.getBoundingClientRect().top ?? 0) + window.scrollY;
@@ -418,6 +441,7 @@ const Index = () => {
             <NavLinkButton
               key={label}
               label={label}
+              href={path}
               onClick={() => {
                 setMenuOpen(false);
                 if (path) { setTimeout(() => navigateTo(path), 80); return; }
