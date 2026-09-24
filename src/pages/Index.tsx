@@ -5,10 +5,12 @@ import { usePageTransition } from "@/components/PageTransition";
 import ExternalLink from "@/components/ExternalLink";
 import profileImg from "@/assets/mh_profile.png";
 import helloSvg from "@/assets/hello.svg";
-import photo1 from "@/assets/DSC03998.jpg";
-import photo2 from "@/assets/DSC04190.jpg";
-import photo3 from "@/assets/DSC04206.jpg";
-import photo4 from "@/assets/DSC042061.jpg";
+// Web-sized copies (1600px) — the 6000px originals cost ~250ms of decode
+// each, which stalled the scroll on the way into this section
+import photo1 from "@/assets/DSC03998-web.jpg";
+import photo2 from "@/assets/DSC04190-web.jpg";
+import photo3 from "@/assets/DSC04206-web.jpg";
+import photo4 from "@/assets/DSC042061-web.jpg";
 import coffeeDesign from "@/assets/coffee-design.svg";
 import coffeeWriting from "@/assets/coffee-writing.svg";
 import photographyIcon from "@/assets/photography.svg";
@@ -16,18 +18,22 @@ import creativeColor from "@/assets/creative-color.svg";
 import coffeeColor from "@/assets/coffee-color.svg";
 import arrowIcon from "@/assets/arrow.svg";
 import photographyColor from "@/assets/photography-color.svg";
+import footerMap from "@/assets/footer-halftone-map.png";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { useTextReveal } from "@/hooks/useTextReveal";
 import { useLenis } from "@/hooks/useLenis";
 import { useGeolocationGreeting } from "@/hooks/useGeolocationGreeting";
 
-const designProjects = [
+// `path` turns a row into a real link to its case study. Rows without one
+// stay as plain text until their write-up exists.
+const designProjects: { name: string; tag?: string; path?: string }[] = [
   { name: "BookMe+", tag: "Present" },
   { name: "Hang Meas Mobile" },
   { name: "VET Airbus" },
   { name: "VDEUK" },
   { name: "VTENH" },
   { name: "GTVC Speedboat" },
-  { name: "BookMeBus" },
+  { name: "BookMeBus", path: "/work/bookmebus" },
 ];
 
 const services = [
@@ -54,6 +60,10 @@ const photoItems = [
   { src: photo3, caption: "Phnom Penh mornings",  captionBg: "#ffffff", rotate: -2,  mt: 8  },
   { src: photo4, caption: "Quiet moments",        captionBg: "#111111", rotate: 6,   mt: 24 },
 ];
+
+// Phones fire mouseenter on tap. The photo hover straightens and scales the
+// card to 1.45×, which on a touch screen just leaves it stuck that way.
+const canHover = () => window.matchMedia("(hover: hover)").matches;
 
 const iconItems = [
   { outline: coffeeDesign,    color: creativeColor,    label: "Design",      size: 96,  mobileSize: 68, offset: 20,  mobileOffset: 14, tip: "Creativity Keeps Me Going", tipColor: "#ea5959" },
@@ -139,7 +149,6 @@ function NavLinkButton({ label, href, onClick, style: extraStyle }: { label: str
 
 const Index = () => {
   const designRef      = useRef<HTMLElement>(null);
-  const projectsRef    = useRef<HTMLDivElement>(null);
   const footerRef      = useRef<HTMLElement>(null);
   const helloRef       = useRef<HTMLImageElement>(null);
   const navRef         = useRef<HTMLElement>(null);
@@ -150,7 +159,6 @@ const Index = () => {
   const photoPathRef   = useRef<SVGPathElement>(null);
 
   const [inView, setInView]                   = useState(false);
-  const [projectsVisible, setProjectsVisible] = useState(false);
   const [hovered, setHovered]                 = useState<string | null>(null);
   const [menuOpen, setMenuOpen]               = useState(false);
   const [heroTextIndex, setHeroTextIndex]     = useState(0);
@@ -273,18 +281,6 @@ const Index = () => {
     return () => obs.disconnect();
   }, []);
 
-  // Project list reveal — repeats every scroll
-  useEffect(() => {
-    const el = projectsRef.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => setProjectsVisible(entry.isIntersecting),
-      { threshold: 0.08 }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
-
   // Icon hover — butter smooth elastic bounce via GSAP
   useEffect(() => {
     const wraps = Array.from(document.querySelectorAll<HTMLElement>(".icon-wrap"));
@@ -320,6 +316,7 @@ const Index = () => {
   }, []);
 
   useScrollReveal();
+  useTextReveal();
   useLenis();
 
   const links = [
@@ -333,7 +330,7 @@ const Index = () => {
       {/* ── Hero — Ink Black ── */}
       <div
         ref={heroSectionRef}
-        className="min-h-screen flex flex-col px-6 py-6 md:px-14 md:py-6 lg:px-[104px]"
+        className="min-h-screen flex flex-col px-6 py-6 md:px-14 md:py-6 lg:px-24"
         style={{ background: "#111111", color: "#ffffff", position: "relative" }}
       >
 
@@ -358,10 +355,13 @@ const Index = () => {
             }}
           >
             <img src={profileImg} alt="Menghour" data-nav-profile className="w-10 h-10 md:w-12 md:h-12" style={{ borderRadius: 0 }} />
+            {/* Desktop-only: it reveals on logo hover, which touch has no
+                equivalent for, and at 210px it overhangs a narrow phone */}
             <img
               ref={helloRef}
               src={helloSvg}
               alt="hello"
+              className="hidden md:block"
               style={{
                 position: "absolute", top: "10%", left: "calc(100% + 12px)",
                 transform: "translateY(-50%)", width: 210, pointerEvents: "none", opacity: 0,
@@ -511,9 +511,13 @@ const Index = () => {
       </div>
 
       {/* ── UX/UI Design — Canvas White ── */}
+      {/* No data-reveal-group here: the section is a full screen tall, so one
+          shared trigger would fire every row while most are still below the
+          fold — and once:true means they'd never replay. Each row triggers
+          on its own instead, revealing as you scroll the list. */}
       <section
         ref={designRef}
-        className="lg:min-h-screen flex flex-col px-6 md:px-14 lg:px-[104px]"
+        className="lg:min-h-screen flex flex-col px-6 md:px-14 lg:px-24"
         style={{
           backgroundColor: inView ? "#ffffff" : "#111111",
           color: inView ? "#000000" : "#ffffff",
@@ -523,82 +527,158 @@ const Index = () => {
         }}
       >
         <p
-          data-animate
+          data-reveal
           className="font-dm-mono mb-8 md:mb-14"
           style={{ fontSize: "clamp(15px, 3.5vw, 26px)", fontWeight: 500, color: inView ? "#111111" : "#4b5563", transition: "color 0.8s ease" }}
         >
           UX/UI Design
         </p>
 
-        <div ref={projectsRef} className="flex flex-col" onMouseLeave={() => setHovered(null)}>
-          {designProjects.map(({ name, tag }, i) => (
-            <div
-              key={name}
-              onMouseEnter={() => setHovered(name)}
-              style={{
-                borderTop: `1px solid ${inView ? "#e5e7eb" : "#1a1a1a"}`,
-                transition: "border-color 0.8s ease",
-                cursor: "default",
-                overflow: "hidden",
-              }}
-            >
+        <div className="flex flex-col" onMouseLeave={() => setHovered(null)}>
+          {designProjects.map(({ name, tag, path }) => {
+            const rowStyle: React.CSSProperties = {
+              fontSize: "clamp(28px, 6.5vw, 86px)", lineHeight: 1.05,
+              letterSpacing: "-0.033em", paddingTop: 10, paddingBottom: 10,
+              display: "flex", alignItems: "baseline", gap: 12,
+              position: "relative",
+              opacity: hovered && hovered !== name ? 0.25 : 1,
+              transition: "opacity 0.3s ease",
+              color: "inherit", textDecoration: "none",
+            };
+
+            const inner = (
+              <>
+                <span style={{
+                  position: "absolute", left: "-0.9em", fontSize: "0.6em",
+                  opacity: hovered === name ? 1 : 0,
+                  transform: hovered === name ? "translateX(0)" : "translateX(-8px)",
+                  transition: "opacity 0.25s ease, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
+                }}>
+                  →
+                </span>
+                {/* Only the name is split — the arrow is absolutely positioned
+                    and the tag is its own type style, so both stay outside */}
+                <span data-reveal>{name}</span>
+                {tag && (
+                  <span className="font-dm-mono" style={{ fontSize: 12, fontWeight: 500, letterSpacing: "0.05em", textTransform: "uppercase", color: inView ? "#6b7280" : "#4b5563", transition: "color 0.8s ease" }}>
+                    {tag}
+                  </span>
+                )}
+              </>
+            );
+
+            return (
               <div
+                key={name}
+                onMouseEnter={() => setHovered(name)}
                 style={{
-                  transform: projectsVisible ? "translateY(0)" : "translateY(112%)",
-                  transition: "transform 0.85s cubic-bezier(0.16, 1, 0.3, 1)",
-                  transitionDelay: `${i * 0.09}s`,
+                  borderTop: `1px solid ${inView ? "#e5e7eb" : "#1a1a1a"}`,
+                  transition: "border-color 0.8s ease",
+                  cursor: path ? "pointer" : "default",
+                  overflow: "hidden",
                 }}
               >
-                <span
-                  className="font-anton"
-                  style={{
-                    fontSize: "clamp(28px, 6.5vw, 86px)", lineHeight: 1.05,
-                    letterSpacing: "-0.033em", paddingTop: 10, paddingBottom: 10,
-                    display: "flex", alignItems: "baseline", gap: 12,
-                    position: "relative",
-                    opacity: hovered && hovered !== name ? 0.25 : 1,
-                    transition: "opacity 0.3s ease",
-                  }}
-                >
-                  <span style={{
-                    position: "absolute", left: "-0.9em", fontSize: "0.6em",
-                    opacity: hovered === name ? 1 : 0,
-                    transform: hovered === name ? "translateX(0)" : "translateX(-8px)",
-                    transition: "opacity 0.25s ease, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
-                  }}>
-                    →
-                  </span>
-                  {name}
-                  {tag && (
-                    <span className="font-dm-mono" style={{ fontSize: 12, fontWeight: 500, letterSpacing: "0.05em", textTransform: "uppercase", color: inView ? "#6b7280" : "#4b5563", transition: "color 0.8s ease" }}>
-                      {tag}
-                    </span>
-                  )}
-                </span>
+                {/* A real href, so the case study is crawlable and opens in a
+                    new tab on cmd-click; the handler only adds the transition */}
+                {path ? (
+                  <a
+                    href={path}
+                    onClick={(e) => { e.preventDefault(); navigateTo(path); }}
+                    className="font-anton"
+                    style={rowStyle}
+                  >
+                    {inner}
+                  </a>
+                ) : (
+                  <span className="font-anton" style={rowStyle}>{inner}</span>
+                )}
               </div>
-            </div>
-          ))}
+            );
+          })}
           <div style={{ borderTop: `1px solid ${inView ? "#e5e7eb" : "#1a1a1a"}`, transition: "border-color 0.8s ease" }} />
         </div>
       </section>
 
-      {/* ── Photography — Blue ── */}
-      <section style={{ background: "#3883ce", paddingTop: 96, paddingBottom: 96, position: "relative" }}>
+      {/* ── How I Think — Ink Black ── */}
+      <section
+        data-reveal-group
+        className="px-6 md:px-14 lg:px-24"
+        style={{
+          background: "#111111", color: "#ffffff",
+          /* Roomier than the 96px the other bands use, so the statement gets
+             air above and below instead of butting up against the sections
+             either side. Scales with the viewport rather than jumping. */
+          paddingTop: "clamp(112px, 12vw, 184px)",
+          paddingBottom: "clamp(112px, 12vw, 184px)",
+        }}
+      >
+        {/* Headline — lead-in on its own line, then the statement */}
+        <h2
+          data-reveal
+          className="font-anton"
+          style={{
+            fontSize: "clamp(30px, 5.2vw, 76px)",
+            lineHeight: 1.06,
+            letterSpacing: "-0.03em",
+            marginBottom: "clamp(48px, 7vw, 104px)",
+          }}
+        >
+          <span style={{ display: "block" }}>How I Think.</span>
+          I don’t just <span className="accent-hover">design.</span> I keep improving.
+        </h2>
+
+        {/* Three equal columns, one paragraph each */}
         <div
-          className="flex flex-col md:flex-row items-center px-6 md:px-14 lg:px-[104px]"
+          className="grid grid-cols-1 md:grid-cols-3 items-start"
+          style={{ gap: "clamp(40px, 5vw, 72px)" }}
+        >
+          {/* Left copy */}
+          <p
+            data-reveal
+            className="font-dm-mono"
+            style={{ fontSize: 14, color: "#d1d5db", lineHeight: 1.75, maxWidth: 340 }}
+          >
+            I believe good design is never truly finished. Every project is an opportunity to
+            observe, question, learn, and make something better.
+          </p>
+
+          {/* Centre copy */}
+          <p
+            data-reveal
+            className="font-dm-mono"
+            style={{ fontSize: 14, color: "#d1d5db", lineHeight: 1.75, maxWidth: 360 }}
+          >
+            Inspired by the Kaizen mindset, I focus on continuous improvement — refining ideas,
+            simplifying experiences, improving processes, and learning from every iteration.
+          </p>
+
+          {/* Right copy */}
+          <p
+            data-reveal
+            className="font-dm-mono"
+            style={{ fontSize: 14, color: "#d1d5db", lineHeight: 1.75, maxWidth: 360 }}
+          >
+            I’m interested not only in what we create, but also in why it works, how it can
+            evolve, and how it can create more value over time.
+          </p>
+        </div>
+      </section>
+
+      {/* ── Photography — Blue ── */}
+      <section data-reveal-group style={{ background: "#3883ce", paddingTop: 96, paddingBottom: 96, position: "relative" }}>
+        <div
+          className="flex flex-col md:flex-row items-center px-6 md:px-14 lg:px-24"
           style={{ gap: "clamp(24px, 3.5vw, 56px)", position: "relative" }}
         >
           {/* Left: copy */}
-          <div style={{ flexShrink: 0, maxWidth: 300, position: "relative", paddingTop: 120 }}>
+          <div className="photo-copy" style={{ position: "relative" }}>
             <img
               src={photographyColor}
               alt=""
               aria-hidden
+              className="photo-camera"
               style={{
                 position: "absolute",
-                top: -140,
-                left: -32,
-                width: 220,
                 opacity: 1,
                 transform: "rotate(-12deg)",
                 pointerEvents: "none",
@@ -606,8 +686,8 @@ const Index = () => {
                 zIndex: 0,
               }}
             />
-            <div data-animate style={{ display: "inline-block", position: "relative", zIndex: 1, marginBottom: 16 }}>
-              <p className="font-dm-mono" style={{ fontSize: 15, fontWeight: 500, color: "rgba(0,0,0,0.5)" }}>
+            <div style={{ display: "inline-block", position: "relative", zIndex: 1, marginBottom: 16 }}>
+              <p data-reveal className="font-dm-mono" style={{ fontSize: 15, fontWeight: 500, color: "rgba(0,0,0,0.5)" }}>
                 Photography
               </p>
               <svg xmlns="http://www.w3.org/2000/svg" width="180" height="42" viewBox="0 0 608 100" fill="none" style={{ display: "block", marginTop: -34, marginLeft: -30, color: "#111111" }}>
@@ -622,16 +702,16 @@ const Index = () => {
               </svg>
             </div>
             <h2
-              data-animate
+              data-reveal
               className="font-anton"
-              style={{ fontSize: "clamp(42px, 5.5vw, 82px)", lineHeight: 0.93, letterSpacing: "-0.04em", color: "#111111", marginBottom: 20, position: "relative", zIndex: 1, "--reveal-delay": "0.08s" } as React.CSSProperties}
+              style={{ fontSize: "clamp(42px, 5.5vw, 82px)", lineHeight: 0.93, letterSpacing: "-0.04em", color: "#111111", marginBottom: 20, position: "relative", zIndex: 1 }}
             >
               Streets of Phnom Penh
             </h2>
             <p
-              data-animate
+              data-reveal
               className="font-dm-mono"
-              style={{ fontSize: 14, color: "rgba(0,0,0,0.6)", lineHeight: 1.7, maxWidth: 260, marginBottom: 28, "--reveal-delay": "0.16s" } as React.CSSProperties}
+              style={{ fontSize: 14, color: "rgba(0,0,0,0.6)", lineHeight: 1.7, maxWidth: 260, marginBottom: 28 }}
             >
               Documenting life and quiet moments on the streets of Cambodia.
             </p>
@@ -647,13 +727,18 @@ const Index = () => {
             </a>
           </div>
 
-          {/* Right: scattered photos */}
-          <div className="flex items-start justify-center flex-wrap md:flex-nowrap" style={{ flex: 1, gap: 0, minWidth: 0 }}>
+          {/* Right: a plain stacked list on phones, scattered overlapping row from md up */}
+          <div className="photo-stack flex flex-col md:flex-row items-stretch md:items-start justify-center" style={{ flex: 1, minWidth: 0 }}>
             {photoItems.map(({ src, rotate, mt }, i) => (
               <div
                 key={i}
-                style={{ position: "relative", flex: "1 1 200px", minWidth: 0, maxWidth: 420, transform: `rotate(${rotate}deg)`, marginTop: mt, marginRight: -30, cursor: "pointer" }}
+                /* Overlap pulls each photo onto the next, but only once they sit
+                   in a row — below md they wrap one per row, where a negative
+                   margin has nothing to overlap and just runs off-screen. */
+                className="photo-card md:-mr-[30px]"
+                style={{ position: "relative", flex: "1 1 200px", minWidth: 0, maxWidth: 420, transform: `rotate(${rotate}deg)`, marginTop: mt, cursor: "pointer" }}
                 onMouseEnter={(e) => {
+                  if (!canHover()) return;
                   const wrapper = e.currentTarget;
                   const img = wrapper.querySelector("img") as HTMLImageElement;
                   gsap.killTweensOf([wrapper, img]);
@@ -661,6 +746,7 @@ const Index = () => {
                   gsap.to(img, { boxShadow: "0 32px 80px rgba(0,0,0,0.45)", duration: 0.4, ease: "power2.out" });
                 }}
                 onMouseLeave={(e) => {
+                  if (!canHover()) return;
                   const wrapper = e.currentTarget;
                   const img = wrapper.querySelector("img") as HTMLImageElement;
                   gsap.killTweensOf([wrapper, img]);
@@ -671,7 +757,23 @@ const Index = () => {
                 <img
                   src={src}
                   alt="Street photography"
-                  style={{ width: "100%", aspectRatio: "4/3", objectFit: "cover", borderRadius: 8, boxShadow: "0 12px 40px rgba(0,0,0,0.28)", display: "block" }}
+                  loading="lazy"
+                  /* async decode never blocks a scroll frame, even on a slow connection */
+                  decoding="async"
+                  width={1600}
+                  height={1200}
+                  style={{
+                    width: "100%",
+                    height: "auto",
+                    aspectRatio: "4/3",
+                    objectFit: "cover",
+                    borderRadius: 8,
+                    boxShadow: "0 12px 40px rgba(0,0,0,0.28)",
+                    display: "block",
+                    // Own compositor layer — otherwise the 40px blur shadow
+                    // gets repainted on every scroll frame, four times over
+                    transform: "translateZ(0)",
+                  }}
                 />
               </div>
             ))}
@@ -680,32 +782,60 @@ const Index = () => {
       </section>
 
       {/* ── Footer ── */}
-      <footer ref={footerRef} className="footer-dark" style={{ background: "#111111" }}>
+      <footer
+        ref={footerRef}
+        className="footer-dark"
+        style={{ background: "#111111", position: "relative", isolation: "isolate", overflow: "hidden" }}
+      >
+        {/* Halftone map wash. z-index -1 with isolation on the footer puts it
+            above the background but under every bit of content, so nothing
+            else needs restacking. */}
+        <img
+          src={footerMap}
+          alt=""
+          aria-hidden
+          loading="lazy"
+          decoding="async"
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            opacity: 0.05,
+            zIndex: -1,
+            pointerEvents: "none",
+            userSelect: "none",
+          }}
+        />
 
         <div
-          className="grid grid-cols-1 md:grid-cols-3 px-6 md:px-14 lg:px-[104px]"
+          data-reveal-group
+          className="grid grid-cols-1 md:grid-cols-3 px-6 md:px-14 lg:px-24"
           style={{ paddingTop: 80, paddingBottom: 80, gap: 40 }}
         >
           {/* Skills */}
-          <div data-animate style={{ "--reveal-delay": "0s" } as React.CSSProperties}>
+          <div>
             <div style={{ borderTop: "1px solid #2b2b2b", paddingTop: 20, marginBottom: 20 }}>
-              <h2 className="font-dm-mono" style={{ fontSize: 11, fontWeight: 700, color: "#4b5563", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+              <h2 data-reveal className="font-dm-mono" style={{ fontSize: 11, fontWeight: 700, color: "#4b5563", letterSpacing: "0.12em", textTransform: "uppercase" }}>
                 Skills
               </h2>
             </div>
-            <ul className="font-dm-mono" style={{ display: "flex", flexDirection: "column", gap: 7, fontSize: 14, color: "#d1d5db", listStyle: "none", padding: 0, margin: 0, lineHeight: 1.5 }}>
+            <ul data-reveal className="font-dm-mono" style={{ display: "flex", flexDirection: "column", gap: 7, fontSize: 14, color: "#d1d5db", listStyle: "none", padding: 0, margin: 0, lineHeight: 1.5 }}>
               {services.map((s) => <li key={s}>{s}</li>)}
             </ul>
           </div>
 
           {/* Social Media */}
-          <div data-animate style={{ "--reveal-delay": "0.1s" } as React.CSSProperties}>
+          <div>
             <div style={{ borderTop: "1px solid #2b2b2b", paddingTop: 20, marginBottom: 20 }}>
-              <h2 className="font-dm-mono" style={{ fontSize: 11, fontWeight: 700, color: "#4b5563", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+              <h2 data-reveal className="font-dm-mono" style={{ fontSize: 11, fontWeight: 700, color: "#4b5563", letterSpacing: "0.12em", textTransform: "uppercase" }}>
                 Social Media
               </h2>
             </div>
-            <ul className="font-dm-mono" style={{ display: "flex", flexDirection: "column", gap: 7, fontSize: 14, listStyle: "none", padding: 0, margin: 0, lineHeight: 1.5 }}>
+            {/* Links keep the fade-up: splitting anchor text into per-word spans
+                breaks the ::after underline that animates across the whole link */}
+            <ul data-animate className="font-dm-mono" style={{ display: "flex", flexDirection: "column", gap: 7, fontSize: 14, listStyle: "none", padding: 0, margin: 0, lineHeight: 1.5 }}>
               <li><ExternalLink href="https://www.instagram.com/photo.bymenghour/">Instagram</ExternalLink></li>
               <li><ExternalLink href="https://www.linkedin.com/in/menghour-lao/">LinkedIn</ExternalLink></li>
               <li><ExternalLink href="https://medium.com/@menghour_lao">Medium</ExternalLink></li>
@@ -716,16 +846,16 @@ const Index = () => {
           </div>
 
           {/* Bio */}
-          <div data-animate style={{ "--reveal-delay": "0.2s" } as React.CSSProperties}>
+          <div>
             <div style={{ borderTop: "1px solid #2b2b2b", paddingTop: 20, marginBottom: 20 }}>
-              <h2 className="font-dm-mono" style={{ fontSize: 11, fontWeight: 700, color: "#4b5563", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+              <h2 data-reveal className="font-dm-mono" style={{ fontSize: 11, fontWeight: 700, color: "#4b5563", letterSpacing: "0.12em", textTransform: "uppercase" }}>
                 Bio
               </h2>
             </div>
             <div className="font-dm-mono" style={{ display: "flex", flexDirection: "column", gap: 14, fontSize: 14, color: "#d1d5db", lineHeight: 1.75 }}>
-              <p>I'm a product designer and creative director from Phnom Penh, Cambodia. I work with startups and growth-stage companies to build digital products that are both beautiful and scalable.</p>
-              <p>Over 7 years, I've shipped products across Southeast Asia — from zero-to-one mobile apps to design systems serving hundreds of thousands of users. My work spans UI/UX, branding, and creative direction.</p>
-              <p>Outside of design, I'm a street photographer documenting life on the streets of Phnom Penh, and a writer exploring visual storytelling on Medium.</p>
+              <p data-reveal>I'm a product designer and creative director from Phnom Penh, Cambodia. I work with startups and growth-stage companies to build digital products that are both beautiful and scalable.</p>
+              <p data-reveal>Over 7 years, I've shipped products across Southeast Asia — from zero-to-one mobile apps to design systems serving hundreds of thousands of users. My work spans UI/UX, branding, and creative direction.</p>
+              <p data-reveal>Outside of design, I'm a street photographer documenting life on the streets of Phnom Penh, and a writer exploring visual storytelling on Medium.</p>
             </div>
           </div>
         </div>
@@ -733,7 +863,7 @@ const Index = () => {
         {/* Large email CTA */}
         <div
           data-animate
-          className="px-6 md:px-14 lg:px-[104px]"
+          className="px-6 md:px-14 lg:px-24"
           style={{ paddingBottom: 40, "--reveal-delay": "0.15s" } as React.CSSProperties}
         >
           <a
@@ -754,7 +884,7 @@ const Index = () => {
 
         {/* Bottom bar */}
         <div
-          className="px-6 md:px-14 lg:px-[104px] font-dm-mono"
+          className="px-6 md:px-14 lg:px-24 font-dm-mono"
           style={{
             borderTop: "1px solid #1a1a1a", paddingTop: 20, paddingBottom: 20,
             display: "flex", justifyContent: "space-between", alignItems: "center",

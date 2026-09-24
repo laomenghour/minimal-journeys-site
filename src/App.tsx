@@ -9,6 +9,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { PageTransition } from "@/components/PageTransition";
 import Index from "./pages/Index";
 import About from "./pages/About";
+import BookMeBus from "./pages/BookMeBus";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -79,6 +80,7 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/about" element={<About />} />
+              <Route path="/work/bookmebus" element={<BookMeBus />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

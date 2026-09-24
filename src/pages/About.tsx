@@ -10,7 +10,9 @@ import coffeeColorIcon from "@/assets/coffee-color.svg";
 import photographyColorIcon from "@/assets/photography-color.svg";
 import helloSvg from "@/assets/hello.svg";
 import arrowIcon from "@/assets/arrow.svg";
+import footerMap from "@/assets/footer-halftone-map.png";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { useTextReveal } from "@/hooks/useTextReveal";
 import { useLenis } from "@/hooks/useLenis";
 import { useGeolocationGreeting } from "@/hooks/useGeolocationGreeting";
 import ExternalLink from "@/components/ExternalLink";
@@ -222,6 +224,7 @@ const About = () => {
   }, []);
 
   useScrollReveal();
+  useTextReveal();
   useLenis();
 
   const navItems = [
@@ -233,7 +236,7 @@ const About = () => {
     <div style={{ background: "#111111", color: "#ffffff" }}>
 
       {/* ── Nav ── */}
-      <div className="px-6 py-6 md:px-14 lg:px-[104px]" style={{ background: "#111111" }}>
+      <div className="px-6 py-6 md:px-14 lg:px-24" style={{ background: "#111111" }}>
         <nav
           ref={navRef}
           className="relative flex items-center justify-between py-3 md:py-4"
@@ -262,10 +265,12 @@ const About = () => {
                 style={{ borderRadius: 0, cursor: "pointer", display: "block" }}
               />
             </a>
+            {/* Desktop-only: hover-revealed, and at 210px it overhangs a phone */}
             <img
               ref={helloRef}
               src={helloSvg}
               alt="hello"
+              className="hidden md:block"
               style={{
                 position: "absolute", top: "10%", left: "calc(100% + 12px)",
                 transform: "translateY(-50%)", width: 210, pointerEvents: "none",
@@ -346,7 +351,7 @@ const About = () => {
       </div>
 
       {/* ── Hero ── */}
-      <section className="px-6 md:px-14 lg:px-[104px]" style={{ paddingTop: 48, paddingBottom: 80 }}>
+      <section className="px-6 md:px-14 lg:px-24" style={{ paddingTop: 48, paddingBottom: 80 }}>
         <div
           className="grid grid-cols-1 md:grid-cols-2"
           style={{ gap: "clamp(40px, 6vw, 96px)", alignItems: "center" }}
@@ -449,9 +454,9 @@ const About = () => {
       </section>
 
       {/* ── Experience ── */}
-      <section className="px-6 md:px-14 lg:px-[104px]" style={{ paddingBottom: 72 }}>
+      <section data-reveal-group className="px-6 md:px-14 lg:px-24" style={{ paddingBottom: 72 }}>
         <p
-          data-animate
+          data-reveal
           className="font-dm-mono mb-10"
           style={{ fontSize: 11, fontWeight: 700, color: "#4b5563", letterSpacing: "0.14em", textTransform: "uppercase" }}
         >
@@ -459,12 +464,8 @@ const About = () => {
         </p>
 
         <div>
-          {experience.map(({ company, role, period, location }, i) => (
-            <div
-              key={`${company}-${role}`}
-              data-animate
-              style={{ "--reveal-delay": `${i * 0.07}s` } as React.CSSProperties}
-            >
+          {experience.map(({ company, role, period, location }) => (
+            <div key={`${company}-${role}`}>
               <div
                 style={{
                   borderTop: "1px solid #1a1a1a",
@@ -474,12 +475,13 @@ const About = () => {
               >
                 <div className="flex flex-col md:flex-row md:items-baseline" style={{ gap: "6px 20px" }}>
                   <span
+                    data-reveal
                     className="font-anton"
                     style={{ fontSize: "clamp(24px, 4.5vw, 64px)", lineHeight: 1.02, letterSpacing: "-0.033em", flex: 1 }}
                   >
                     {company}
                   </span>
-                  <div className="font-dm-mono" style={{ fontSize: 13, color: "#6b7280", flexShrink: 0, lineHeight: 1.6 }}>
+                  <div data-reveal className="font-dm-mono" style={{ fontSize: 13, color: "#6b7280", flexShrink: 0, lineHeight: 1.6 }}>
                     <span style={{ color: "#d1d5db" }}>{role}</span>
                     <span style={{ margin: "0 8px", opacity: 0.35 }}>·</span>
                     <span>{period}</span>
@@ -495,9 +497,9 @@ const About = () => {
       </section>
 
       {/* ── Education ── */}
-      <section className="px-6 md:px-14 lg:px-[104px]" style={{ paddingBottom: 72 }}>
+      <section data-reveal-group className="px-6 md:px-14 lg:px-24" style={{ paddingBottom: 72 }}>
         <p
-          data-animate
+          data-reveal
           className="font-dm-mono mb-10"
           style={{ fontSize: 11, fontWeight: 700, color: "#4b5563", letterSpacing: "0.14em", textTransform: "uppercase" }}
         >
@@ -505,12 +507,8 @@ const About = () => {
         </p>
 
         <div>
-          {education.map(({ institution, degree, field, period }, i) => (
-            <div
-              key={institution}
-              data-animate
-              style={{ "--reveal-delay": `${i * 0.07}s` } as React.CSSProperties}
-            >
+          {education.map(({ institution, degree, field, period }) => (
+            <div key={institution}>
               <div
                 style={{
                   borderTop: "1px solid #1a1a1a",
@@ -520,12 +518,13 @@ const About = () => {
               >
                 <div className="flex flex-col md:flex-row md:items-baseline" style={{ gap: "6px 20px" }}>
                   <span
+                    data-reveal
                     className="font-anton"
                     style={{ fontSize: "clamp(20px, 3.5vw, 52px)", lineHeight: 1.02, letterSpacing: "-0.03em", flex: 1 }}
                   >
                     {institution}
                   </span>
-                  <div className="font-dm-mono" style={{ fontSize: 13, color: "#6b7280", flexShrink: 0, lineHeight: 1.6 }}>
+                  <div data-reveal className="font-dm-mono" style={{ fontSize: 13, color: "#6b7280", flexShrink: 0, lineHeight: 1.6 }}>
                     <span style={{ color: "#d1d5db" }}>{degree}</span>
                     <span style={{ margin: "0 8px", opacity: 0.35 }}>·</span>
                     <span>{field}</span>
@@ -541,30 +540,55 @@ const About = () => {
       </section>
 
       {/* ── Footer ── */}
-      <footer className="footer-dark" style={{ background: "#111111" }}>
+      <footer
+        className="footer-dark"
+        style={{ background: "#111111", position: "relative", isolation: "isolate", overflow: "hidden" }}
+      >
+        {/* Halftone map wash — see the matching note on the Work page footer */}
+        <img
+          src={footerMap}
+          alt=""
+          aria-hidden
+          loading="lazy"
+          decoding="async"
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            opacity: 0.7,
+            zIndex: -1,
+            pointerEvents: "none",
+            userSelect: "none",
+          }}
+        />
 
         <div
-          className="grid grid-cols-1 md:grid-cols-3 px-6 md:px-14 lg:px-[104px]"
+          data-reveal-group
+          className="grid grid-cols-1 md:grid-cols-3 px-6 md:px-14 lg:px-24"
           style={{ paddingTop: 48, paddingBottom: 48, gap: 40 }}
         >
-          <div data-animate style={{ "--reveal-delay": "0s" } as React.CSSProperties}>
+          <div>
             <div style={{ borderTop: "1px solid #2b2b2b", paddingTop: 20, marginBottom: 20 }}>
-              <h2 className="font-dm-mono" style={{ fontSize: 11, fontWeight: 700, color: "#4b5563", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+              <h2 data-reveal className="font-dm-mono" style={{ fontSize: 11, fontWeight: 700, color: "#4b5563", letterSpacing: "0.12em", textTransform: "uppercase" }}>
                 Skills
               </h2>
             </div>
-            <ul className="font-dm-mono" style={{ display: "flex", flexDirection: "column", gap: 7, fontSize: 14, color: "#d1d5db", listStyle: "none", padding: 0, margin: 0, lineHeight: 1.5 }}>
+            <ul data-reveal className="font-dm-mono" style={{ display: "flex", flexDirection: "column", gap: 7, fontSize: 14, color: "#d1d5db", listStyle: "none", padding: 0, margin: 0, lineHeight: 1.5 }}>
               {services.map((s) => <li key={s}>{s}</li>)}
             </ul>
           </div>
 
-          <div data-animate style={{ "--reveal-delay": "0.1s" } as React.CSSProperties}>
+          <div>
             <div style={{ borderTop: "1px solid #2b2b2b", paddingTop: 20, marginBottom: 20 }}>
-              <h2 className="font-dm-mono" style={{ fontSize: 11, fontWeight: 700, color: "#4b5563", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+              <h2 data-reveal className="font-dm-mono" style={{ fontSize: 11, fontWeight: 700, color: "#4b5563", letterSpacing: "0.12em", textTransform: "uppercase" }}>
                 Social Media
               </h2>
             </div>
-            <ul className="font-dm-mono" style={{ display: "flex", flexDirection: "column", gap: 7, fontSize: 14, listStyle: "none", padding: 0, margin: 0, lineHeight: 1.5 }}>
+            {/* Links keep the fade-up: splitting anchor text into per-word spans
+                breaks the ::after underline that animates across the whole link */}
+            <ul data-animate className="font-dm-mono" style={{ display: "flex", flexDirection: "column", gap: 7, fontSize: 14, listStyle: "none", padding: 0, margin: 0, lineHeight: 1.5 }}>
               <li><ExternalLink href="https://www.instagram.com/photo.bymenghour/">Instagram</ExternalLink></li>
               <li><ExternalLink href="https://www.linkedin.com/in/menghour-lao/">LinkedIn</ExternalLink></li>
               <li><ExternalLink href="https://medium.com/@menghour_lao">Medium</ExternalLink></li>
@@ -572,22 +596,22 @@ const About = () => {
             </ul>
           </div>
 
-          <div data-animate style={{ "--reveal-delay": "0.2s" } as React.CSSProperties}>
+          <div>
             <div style={{ borderTop: "1px solid #2b2b2b", paddingTop: 20, marginBottom: 20 }}>
-              <h2 className="font-dm-mono" style={{ fontSize: 11, fontWeight: 700, color: "#4b5563", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+              <h2 data-reveal className="font-dm-mono" style={{ fontSize: 11, fontWeight: 700, color: "#4b5563", letterSpacing: "0.12em", textTransform: "uppercase" }}>
                 Bio
               </h2>
             </div>
             <div className="font-dm-mono" style={{ display: "flex", flexDirection: "column", gap: 14, fontSize: 14, color: "#d1d5db", lineHeight: 1.75 }}>
-              <p>I'm a product designer and creative director from Phnom Penh, Cambodia. I work with startups and growth-stage companies to build digital products that are both beautiful and scalable.</p>
-              <p>Over 7 years, I've shipped products across Southeast Asia — from zero-to-one mobile apps to design systems serving hundreds of thousands of users.</p>
+              <p data-reveal>I'm a product designer and creative director from Phnom Penh, Cambodia. I work with startups and growth-stage companies to build digital products that are both beautiful and scalable.</p>
+              <p data-reveal>Over 7 years, I've shipped products across Southeast Asia — from zero-to-one mobile apps to design systems serving hundreds of thousands of users.</p>
             </div>
           </div>
         </div>
 
         <div
           data-animate
-          className="px-6 md:px-14 lg:px-[104px]"
+          className="px-6 md:px-14 lg:px-24"
           style={{ paddingBottom: 40, "--reveal-delay": "0.15s" } as React.CSSProperties}
         >
           <a
@@ -607,7 +631,7 @@ const About = () => {
         </div>
 
         <div
-          className="px-6 md:px-14 lg:px-[104px] font-dm-mono"
+          className="px-6 md:px-14 lg:px-24 font-dm-mono"
           style={{
             borderTop: "1px solid #1a1a1a", paddingTop: 20, paddingBottom: 20,
             display: "flex", justifyContent: "space-between", alignItems: "center",

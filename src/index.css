@@ -116,6 +116,18 @@ html {
   cursor: none;
 }
 
+/* The page sits on ink black, not the white --background token. This is what
+   shows above the nav in mobile Safari and in the overscroll bounce. */
+html,
+body {
+  background-color: #111111;
+  max-width: 100%;
+  /* clip, not hidden: `overflow-x: hidden` forces overflow-y to `auto` and
+     turns the root into a scroll container, which fights Lenis. `clip`
+     trims the horizontal overflow without touching the vertical axis. */
+  overflow-x: clip;
+}
+
 * {
   cursor: none !important;
 }
@@ -129,12 +141,103 @@ html {
 ::-webkit-scrollbar-thumb:hover { background: #666666; }
 * { scrollbar-width: thin; scrollbar-color: #444444 #111111; }
 
+/* No scroll rail on phones and tablets — touch devices scroll by gesture and
+   the bar only eats into the layout */
+@media (max-width: 1023px) {
+  ::-webkit-scrollbar { width: 0; height: 0; display: none; }
+  * { scrollbar-width: none; }
+}
+
 /* ─────────────────────────────────────────
    Hero mask — overflow container for GSAP clip-up
 ───────────────────────────────────────── */
 .hero-mask {
   overflow: hidden;
   display: block;
+}
+
+/* ─────────────────────────────────────────
+   Photography section
+───────────────────────────────────────── */
+.photo-camera {
+  top: -140px;
+  left: -32px;
+  width: 220px;
+}
+
+.photo-copy {
+  padding-top: 120px;
+  /* Lives here rather than inline so the phone rule below can undo it */
+  max-width: 300px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 767px) {
+  /* Smaller camera, tucked in so it can't push the page sideways */
+  .photo-camera {
+    top: -104px;
+    left: -8px;
+    width: 116px;
+  }
+
+  /* Full width, so the parent's items-center has nothing left to centre and
+     the copy sits on the page gutter instead of floating in from the left.
+     The reduced top padding pulls the copy up to meet the raised camera. */
+  .photo-copy {
+    padding-top: 36px;
+    max-width: none;
+    width: 100%;
+  }
+
+  /* Overlap comes from negative margins, so no gap between the cards */
+  .photo-stack {
+    gap: 0;
+  }
+
+  /* Keep each photo's own rotation (no transform reset) and let the stack
+     cascade — alternating edges plus a negative margin so they overlap */
+  .photo-card {
+    flex: 0 0 auto !important;
+    width: 86%;
+    max-width: 86% !important;
+    margin-top: -28px !important;
+  }
+
+  .photo-card:first-child {
+    margin-top: 0 !important;
+  }
+
+  .photo-card:nth-child(odd) {
+    align-self: flex-start;
+  }
+
+  .photo-card:nth-child(even) {
+    align-self: flex-end;
+  }
+}
+
+/* ─────────────────────────────────────────
+   Accent word — brand coral on hover
+───────────────────────────────────────── */
+.accent-hover,
+/* SplitText wraps the word in its own span, so the colour has to reach
+   through to whatever it generates inside */
+.accent-hover .reveal-word {
+  transition: color 0.3s ease;
+}
+
+.accent-hover:hover,
+.accent-hover:hover .reveal-word {
+  color: #ea5959;
+}
+
+/* ─────────────────────────────────────────
+   Scroll text reveal — [data-reveal]
+───────────────────────────────────────── */
+.reveal-word {
+  display: inline-block;
+  /* descenders (y, p, g) would otherwise be clipped by the line mask */
+  padding-bottom: 0.1em;
 }
 
 /* ─────────────────────────────────────────
@@ -161,7 +264,8 @@ html {
     position: absolute;
     display: flex;
     bottom: 48px;
-    right: 104px;
+    /* Matches the lg:px-24 gutter so the icons sit on the content edge */
+    right: 96px;
     gap: 28px;
   }
 }

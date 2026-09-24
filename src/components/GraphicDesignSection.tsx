@@ -80,7 +80,7 @@ export function GraphicDesignSection() {
   return (
     <section
       ref={sectionRef}
-      className="flex flex-col px-6 py-6 md:px-14 lg:px-[104px]"
+      className="flex flex-col px-6 py-6 md:px-14 lg:px-24"
       style={{
         backgroundColor: inView ? "#ffffff" : "#111111",
         color:           inView ? "#000000" : "#ffffff",
